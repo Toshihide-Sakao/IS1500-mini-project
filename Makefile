@@ -49,7 +49,7 @@ envcheck:
 		echo " **************************************************************"; \
 		echo " * Make sure you have sourced the cross compiling environment *"; \
 		echo " * Do this by issuing:                                        *"; \
-		echo " * . /path/to/crosscompiler/environment                       *"; \
+		echo " * . /opt/mcb32tools/environment		                        *"; \
 		echo " **************************************************************"; \
 		echo ""; \
 		exit 1)
