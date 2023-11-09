@@ -6,35 +6,32 @@
 const uint32_t map[128];
 const uint8_t disp[512];
 
-void draw_map(uint32_t *map) {
-    printf("draw map (rotation is wrong)\n");
-    for (int i = 0; i < 128; i++)
-    {
-        print_binary(map[i]);
-    }
-    printf("----------------------------------\n");
+void draw_map(uint32_t *map)
+{
+	printf("draw map (rotation is wrong)\n");
+	for (int i = 0; i < 128; i++)
+	{
+		print_binary(map[i], 31);
+	}
+	printf("----------------------------------\n");
 }
 
-void draw_disp(uint8_t *disp) {
-    printf("draw disp\n");
-    for (int i = 0; i < 128; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            print_binary(disp[j * 128 + i]);
-        }
-        
-        print_binary(disp[i]);
-    }
-    printf("----------------------------------\n");
+void draw_disp(uint8_t *disp)
+{
+	printf("draw disp\n");
+	
+
+	printf("----------------------------------\n");
 }
 
-void print_binary(uint32_t x) {
-    int i;
-    for (i = 31; i >= 0; i--) {
-        printf("%d", (x >> i) & 1);
-    }
-    printf("\n");
+void print_binary(uint32_t x, int n)
+{
+	int i;
+	for (i = n; i >= 0; i--)
+	{
+		printf("%d", (x >> i) & 1);
+	}
+	printf("\n");
 }
 
 void conv_normal_to_disp(uint32_t *map, uint8_t *disp)
@@ -42,10 +39,17 @@ void conv_normal_to_disp(uint32_t *map, uint8_t *disp)
 	int i, j;
 	for (i = 0; i < 128; i++)
 	{
+		int k = 3;
 		for (j = 0; j < 4; j++)
 		{
-			disp[i * 4 + j] = (map[i] >> (8 * j)) & 0xFF;
+			//dumb
+			uint8_t tmp;
+			tmp = (map[i] >> 8 * j) & 0xff;
+			print_binary(tmp, 7);
+			disp[4 * i + k] = tmp;
+			k--;
 		}
+		printf("-------\n");
 	}
 }
 
@@ -77,15 +81,16 @@ void gen_map(uint32_t *map)
 	}
 }
 
-int main() {
-    gen_map(map);
-    draw_map(map);
+int main()
+{
+	gen_map(map);
+	draw_map(map);
 
-    conv_normal_to_disp(map, disp); // not working
-    printf("testing\n");
-    print_binary(disp[0]);
-    print_binary(disp[1]);
-    // draw_disp(disp);
+	conv_normal_to_disp(map, disp); // not working
+	// printf("testing\n");
+	// print_binary(disp[0]);
+	// print_binary(disp[1]);
+	// draw_disp(disp);
 
-    return 0;
+	return 0;
 }
