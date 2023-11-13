@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "chipkit_funcs.h"
 
 void gen_map(uint32_t *map)
 {

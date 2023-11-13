@@ -10,3 +10,6 @@ void display_update(const uint8_t *data);
 void display_reset();
 void display_update_text();
 void conv_normal_to_disp(uint32_t *map, uint8_t *disp);
+
+int getsw(void);
+int getbtns(void);
