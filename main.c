@@ -51,8 +51,7 @@ int main(void)
 	while (1)
 	{
 		game(map);
-		conv_normal_to_disp(map, disp);
-		display_update(disp);
+		display_update(map);
 	}
 
 	return 0;

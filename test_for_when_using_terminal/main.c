@@ -16,14 +16,6 @@ void draw_map(uint32_t *map)
 	printf("----------------------------------\n");
 }
 
-void draw_disp(uint8_t *disp)
-{
-	printf("draw disp\n");
-	
-
-	printf("----------------------------------\n");
-}
-
 void print_binary(uint32_t x, int n)
 {
 	int i;
@@ -32,25 +24,6 @@ void print_binary(uint32_t x, int n)
 		printf("%d", (x >> i) & 1);
 	}
 	printf("\n");
-}
-
-void conv_normal_to_disp(uint32_t *map, uint8_t *disp)
-{
-	int i, j;
-	for (i = 0; i < 128; i++)
-	{
-		int k = 3;
-		for (j = 0; j < 4; j++)
-		{
-			//dumb
-			uint8_t tmp;
-			tmp = (map[i] >> 8 * j) & 0xff;
-			print_binary(tmp, 7);
-			disp[4 * i + k] = tmp;
-			k--;
-		}
-		printf("-------\n");
-	}
 }
 
 void gen_map(uint32_t *map)
@@ -85,12 +58,6 @@ int main()
 {
 	gen_map(map);
 	draw_map(map);
-
-	conv_normal_to_disp(map, disp); // not working
-	// printf("testing\n");
-	// print_binary(disp[0]);
-	// print_binary(disp[1]);
-	// draw_disp(disp);
 
 	return 0;
 }
