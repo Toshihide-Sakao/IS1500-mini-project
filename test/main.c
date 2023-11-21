@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "vector.h"
+#include "player.h"
 
 uint32_t map[96];
 // x: 96, y: 32
@@ -20,14 +21,17 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
+vec2 player_pos = { 10, 10 };
+vec2 player_dir = { 1, 1 };
+
 void draw_map(uint32_t *map)
 {
-	printf("draw map (rotation is wrong)\n");
+	// printf("draw map (rotation is wrong)\n");
 	for (int i = 0; i < 96; i++)
 	{
 		print_binary(map[i], 31);
 	}
-	printf("----------------------------------\n");
+	// printf("----------------------------------\n");
 }
 
 void print_binary(uint32_t x, int n)
@@ -62,7 +66,7 @@ void gen_map(uint32_t *map)
 	}
 }
 
-void gen_2d_map()
+void print_2d_map()
 {
 	int i, j;
 	for (i = 0; i < 8; i++)
@@ -110,9 +114,19 @@ int main()
 	// gen_map(map);
 	// draw_map(map);
 
-	gen_2d_map();
+	// print_2d_map();
 	conv_2d_to_map(map2d, map);
+	draw_player(player_pos, player_dir, map);
+	printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
+
 	draw_map(map);
+
+	// while (1)
+	// {
+	// 	system("clear");
+	// 	conv_2d_to_map(map2d, map);
+	// 	draw_map(map);
+	// }
 
 	return 0;
 }

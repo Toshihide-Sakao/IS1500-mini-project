@@ -1,6 +1,11 @@
 #include <stdint.h>
 #include "chipkit_funcs.h"
 
+#include "vector.h"
+
+vec2 player_pos = { 20, 30 };
+vec2 player_dir = { 1, 0 };
+
 // x: 96, y: 32
 uint8_t map2d[8][16] =
 	{
