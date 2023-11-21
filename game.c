@@ -1,36 +1,52 @@
 #include <stdint.h>
 #include "chipkit_funcs.h"
 
-void gen_map(uint32_t *map)
-{
-	int i;
-	uint32_t edge = 0;
-	edge = 1 << 31;
-	edge |= 1;
-	edge = ~edge;
-	uint32_t normal = 0;
-	normal = 1 << 30;
-	normal |= 2;
-
-	for (i = 0; i < 128; i++)
+// x: 96, y: 32
+uint8_t map2d[8][16] =
 	{
-		if (i == 1 || i == 126)
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+};
+
+
+void set_pos(int x, int y, uint32_t *map)
+{
+	uint32_t mask = 0;
+	mask = 1 << (31 - x);
+	map[y] |= mask;
+}
+
+void clear_pos(int x, int y, uint32_t *map)
+{
+	uint32_t mask = 0;
+	mask = 1 << (31 - x);
+	map[y] &= ~mask;
+}
+
+void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
+{
+	int i, j;
+	for (i = 0; i < 8 * 4; i++)
+	{
+		for (j = 0; j < 16 * 4; j++)
 		{
-			map[i] = edge;
-		}
-		else if (i == 0 || i == 127)
-		{
-			map[i] = 0x0;
-		}
-		else
-		{
-			map[i] = normal;
+			if (map2d[i / 4][j / 4] == 1)
+			{
+				set_pos(i, j, map);
+			}
 		}
 	}
 }
 
 void init_game(uint32_t *map) {
-    gen_map(map);
+    gen_2d_map();
+	conv_2d_to_map(map2d, map);
 }
 // game loop
 void game(uint32_t *map) {
