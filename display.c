@@ -87,7 +87,7 @@ void display_string(int line, char *s)
 			textbuffer[line][i] = ' ';
 }
 
-void display_update(const uint8_t *data)
+void display_update(const uint32_t *map)
 {
 	int i, y, x;
 
@@ -104,7 +104,7 @@ void display_update(const uint8_t *data)
 
 		for (x = 0; x < 128; x++)
 		{
-			spi_send_recv(data[x + 128 * i]);
+			spi_send_recv((map[x] >> 8 * i) & 0xff);
 		}
 	}
 }
@@ -161,14 +161,14 @@ void display_update_text()
 }
 
 // convert a uint32_t[128] to a uint8_t[512]
-void conv_normal_to_disp(uint32_t *map, uint8_t *disp)
-{
-	int i, j;
-	for (i = 0; i < 128; i++)
-	{
-		for (j = 0; j < 4; j++)
-		{
-			disp[128 * j + i] = (map[i] >> 8 * j) & 0xff;
-		}
-	}
-}
+// void conv_normal_to_disp(uint32_t *map, uint8_t *disp)
+// {
+// 	int i, j;
+// 	for (i = 0; i < 128; i++)
+// 	{
+// 		for (j = 0; j < 4; j++)
+// 		{
+// 			disp[128 * j + i] = (map[i] >> 8 * j) & 0xff;
+// 		}
+// 	}
+// }
