@@ -37,20 +37,45 @@ void clr_pos(int x, int y, uint32_t *map)
 	map[x] &= ~mask;
 }
 
+uint8_t get_pos(int x, int y, uint32_t *map)
+{
+	uint32_t mask = 0;
+	mask = 1 << (y);
+	return (map[x] & mask) >> y;
+}
+
 void draw_line(vec2 p1, vec2 p2, uint32_t *map)
 {
 	int i;
 	double dx = p2.x - p1.x;
 	double dy = p2.y - p1.y;
-	double step = 0.1;
 	double x = p1.x;
 	double y = p1.y;
 
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 100; i++)
 	{
+		if (x < 0 || x > 95 || y < 0 || y > 31) { break; } // not needed if we are not dumb
+		
 		set_pos((int)x, (int)y, map);
-		x += dx * step;
-		y += dy * step;
+		x += dx / 100;
+		y += dy / 100;
+	}
+}
+
+void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
+{
+	if ((endY - startY) == 1)
+	{
+		return;
+	}
+	
+	int i;
+	uint32_t tmp = ~0;
+	tmp = tmp >> (31 - (endY - startY));
+	tmp = tmp << startY;
+	for (i = startX; i < endX; i++)
+	{
+		map[i] |= tmp;
 	}
 }
 
