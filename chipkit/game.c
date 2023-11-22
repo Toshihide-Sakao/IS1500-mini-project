@@ -6,8 +6,8 @@
 
 #define PI 3.14159265
 
-vec2 player_pos = { 10, 10 };
-double player_angle = PI * (4.0/4.0);
+vec2 player_pos = {10, 10};
+double player_angle = PI * (4.0 / 4.0);
 
 // x: 96, y: 32
 uint8_t map2d[8][16] =
@@ -21,7 +21,6 @@ uint8_t map2d[8][16] =
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
-
 
 void set_pos(int x, int y, uint32_t *map)
 {
@@ -69,13 +68,39 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 	}
 }
 
-void init_game(uint32_t *map) {
-    // gen_2d_map();
+void init_game(uint32_t *map)
+{
+	// gen_2d_map();
 	conv_2d_to_map(map2d, map);
 	draw_player(player_pos, player_angle, map);
-
 }
+
+void player_inputs(vec2 *player_pos, double player_angle, uint32_t *map)
+{
+	int btns = getbtns();
+	if (btns != 0)
+	{
+		int sw = getsw();
+		if (btns & 0b1) // btn2
+		{
+			move_player(player_pos, player_angle, map);
+		}
+		if (btns & 0b10) // btn3
+		{
+			move_player(player_pos, player_angle + PI, map);
+		}
+		if (btns & 0b100) // btn4
+		{
+			rotate_player(player_angle);
+		}
+	}
+}
+
 // game loop
-void game(uint32_t *map) {
+void game(uint32_t *map)
+{
 	
+	player_inputs(&player_pos, player_angle, map);
+	draw_player(player_pos, player_angle, map);
+	conv_2d_to_map(map2d, map);
 }

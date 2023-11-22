@@ -17,6 +17,7 @@ void draw_player(vec2 pos, double angle, uint32_t *map)
 }
 
 void move_player(vec2 *pos, double angle, uint32_t *map) {
+    // need to clr direction line as well
     clr_pos((int)pos->x, (int)pos->y, map);
     pos->x += cos(angle);
     pos->y += sin(angle);
