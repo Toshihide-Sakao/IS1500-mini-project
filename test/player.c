@@ -8,7 +8,7 @@
 
 void draw_player(vec2 pos, double angle, uint32_t *map, uint8_t map2d[8][16])
 {
-	set_pos((int)pos.x, (int)pos.y, map);
+	// set_pos((int)pos.x, (int)pos.y, map);
     // printf("player pos: %f, %f\n", pos.x, pos.y);
     
     // draw line for player direction
@@ -18,7 +18,7 @@ void draw_player(vec2 pos, double angle, uint32_t *map, uint8_t map2d[8][16])
 }
 
 void move_player(vec2 *pos, double angle, uint32_t *map) {
-    clr_pos((int)pos->x, (int)pos->y, map);
+    // clr_pos((int)pos->x, (int)pos->y, map);
     pos->x += cos(angle);
     pos->y += sin(angle);
 }

@@ -33,6 +33,6 @@ double vec_dot(vec2 a, vec2 b) {
     return a.x * b.x + a.y * b.y;
 }
 
-// double vec_dist(vec2 a, vec2 b) {
-//     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
-// }
+double vec_dist(vec2 a, vec2 b) {
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+}
