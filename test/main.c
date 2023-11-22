@@ -46,27 +46,27 @@ void print_binary(uint32_t x, int n)
 	printf("\n");
 }
 
-void gen_map(uint32_t *map)
-{
-	int i;
-	uint32_t edge = 0;
-	edge = ~0;
-	uint32_t normal = 0;
-	normal = 1 << 31;
-	normal |= 1;
+// void gen_map(uint32_t *map)
+// {
+// 	int i;
+// 	uint32_t edge = 0;
+// 	edge = ~0;
+// 	uint32_t normal = 0;
+// 	normal = 1 << 31;
+// 	normal |= 1;
 
-	for (i = 0; i < 96; i++)
-	{
-		if (i == 0 || i == 95)
-		{
-			map[i] = edge;
-		}
-		else
-		{
-			map[i] = normal;
-		}
-	}
-}
+// 	for (i = 0; i < 96; i++)
+// 	{
+// 		if (i == 0 || i == 95)
+// 		{
+// 			map[i] = edge;
+// 		}
+// 		else
+// 		{
+// 			map[i] = normal;
+// 		}
+// 	}
+// }
 
 void print_2d_map()
 {
@@ -138,11 +138,6 @@ void draw_line(vec2 p1, vec2 p2, uint32_t *map)
 
 void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 {
-	if ((endY - startY) == 1)
-	{
-		return;
-	}
-	
 	int i;
 	uint32_t tmp = ~0;
 	tmp = tmp >> (31 - (endY - startY));

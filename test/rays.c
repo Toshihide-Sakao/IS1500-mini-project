@@ -64,7 +64,9 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 dof = 8;
                 hx = rx;
                 hy = ry;
-                disH = vec_dist(player_pos, (vec2){hx, hy});
+                // disH = vec_dist(player_pos, (vec2){hx, hy});
+                disH = (hx - player_pos.x) * cos(ra) - (hy - player_pos.y) * sin(ra);
+
             }
             else
             {
@@ -117,7 +119,9 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 dof = 8;
                 vx = rx;
                 vy = ry;
-                disV = vec_dist(player_pos, (vec2){vx, vy});
+                // disV = vec_dist(player_pos, (vec2){vx, vy});
+                disV = ((double)vx - player_pos.x) * cos(ra) - ((double)vy - player_pos.y) * sin(ra);
+
             }
             else
             {

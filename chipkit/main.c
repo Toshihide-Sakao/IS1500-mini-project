@@ -4,7 +4,7 @@
 #include "game.h"
 
 char textbuffer[4][16];
-uint32_t map[128];
+uint32_t map[96];
 const uint8_t disp[512];
 
 int main(void)
