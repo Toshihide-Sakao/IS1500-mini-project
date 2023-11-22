@@ -7,7 +7,7 @@
 #include "vector.h"
 #include "player.h"
 
-#define PI 3.14159265
+#define PI 3.14159265535
 
 uint32_t map[128];
 // x: 96, y: 32
@@ -23,8 +23,8 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-vec2 player_pos = { 10, 10 };
-double player_angle = PI * (4.0/4.0);
+vec2 player_pos = { 9, 17 };
+double player_angle = PI * (0/4.0);
 
 void draw_map(uint32_t *map)
 {
@@ -96,6 +96,13 @@ void clr_pos(int x, int y, uint32_t *map)
 	map[x] &= ~mask;
 }
 
+uint8_t get_pos(int x, int y, uint32_t *map)
+{
+	uint32_t mask = 0;
+	mask = 1 << (y);
+	return (map[x] & mask) >> y;
+}
+
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 {
 	int i, j;
@@ -116,24 +123,41 @@ void draw_line(vec2 p1, vec2 p2, uint32_t *map)
 	int i;
 	double dx = p2.x - p1.x;
 	double dy = p2.y - p1.y;
-	double step = 0.1;
 	double x = p1.x;
 	double y = p1.y;
 
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 100; i++)
 	{
+		if (x < 0 || x > 95 || y < 0 || y > 31) { break; } // not needed if we are not dumb
+		
 		set_pos((int)x, (int)y, map);
-		x += dx * step;
-		y += dy * step;
+		x += dx / 100;
+		y += dy / 100;
+	}
+}
+
+void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
+{
+	if ((endY - startY) == 1)
+	{
+		return;
+	}
+	
+	int i;
+	uint32_t tmp = ~0;
+	tmp = tmp >> (31 - (endY - startY));
+	tmp = tmp << startY;
+	for (i = startX; i < endX; i++)
+	{
+		map[i] |= tmp;
 	}
 }
 
 int main()
 {
-
 	// print_2d_map();
-	conv_2d_to_map(map2d, map);
-	draw_player(player_pos, player_angle, map);
+	// conv_2d_to_map(map2d, map);
+	draw_player(player_pos, player_angle, map, map2d);
 	printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
 
 	draw_map(map);
