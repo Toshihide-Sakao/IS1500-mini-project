@@ -75,7 +75,7 @@ void init_game(uint32_t *map)
 	draw_player(player_pos, player_angle, map);
 }
 
-void player_inputs(vec2 *player_pos, double player_angle, uint32_t *map)
+void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 {
 	int btns = getbtns();
 	if (btns != 0)
@@ -87,7 +87,7 @@ void player_inputs(vec2 *player_pos, double player_angle, uint32_t *map)
 		}
 		if (btns & 0b10) // btn3
 		{
-			move_player(player_pos, player_angle + PI, map);
+			move_player(player_pos, *player_angle + PI, map);
 		}
 		if (btns & 0b100) // btn4
 		{
@@ -100,7 +100,7 @@ void player_inputs(vec2 *player_pos, double player_angle, uint32_t *map)
 void game(uint32_t *map)
 {
 	
-	player_inputs(&player_pos, player_angle, map);
+	player_inputs(&player_pos, &player_angle, map);
 	draw_player(player_pos, player_angle, map);
 	conv_2d_to_map(map2d, map);
 }

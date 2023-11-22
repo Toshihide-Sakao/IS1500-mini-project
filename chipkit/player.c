@@ -23,7 +23,7 @@ void move_player(vec2 *pos, double angle, uint32_t *map) {
     pos->y += sin(angle);
 }
 
-void rotate_player(double angle){
-    angle += 0.1;
+void rotate_player(double *angle){
+    *angle += 0.1;
 }
 
