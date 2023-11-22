@@ -1,10 +1,13 @@
 #include <stdint.h>
+#include <math.h>
 #include "chipkit_funcs.h"
 
 #include "vector.h"
 
-vec2 player_pos = { 20, 30 };
-vec2 player_dir = { 1, 0 };
+#define PI 3.14159265
+
+vec2 player_pos = { 10, 10 };
+double player_angle = PI * (4.0/4.0);
 
 // x: 96, y: 32
 uint8_t map2d[8][16] =
@@ -23,15 +26,32 @@ uint8_t map2d[8][16] =
 void set_pos(int x, int y, uint32_t *map)
 {
 	uint32_t mask = 0;
-	mask = 1 << (x);
-	map[y] |= mask;
+	mask = 1 << (y);
+	map[x] |= mask;
 }
 
-void clear_pos(int x, int y, uint32_t *map)
+void clr_pos(int x, int y, uint32_t *map)
 {
 	uint32_t mask = 0;
-	mask = 1 << (x);
-	map[y] &= ~mask;
+	mask = 1 << (y);
+	map[x] &= ~mask;
+}
+
+void draw_line(vec2 p1, vec2 p2, uint32_t *map)
+{
+	int i;
+	double dx = p2.x - p1.x;
+	double dy = p2.y - p1.y;
+	double step = 0.1;
+	double x = p1.x;
+	double y = p1.y;
+
+	for (i = 0; i < 10; i++)
+	{
+		set_pos((int)x, (int)y, map);
+		x += dx * step;
+		y += dy * step;
+	}
 }
 
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
@@ -43,7 +63,7 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 		{
 			if (map2d[i / 4][j / 4] == 1)
 			{
-				set_pos(i, j, map);
+				set_pos(j, i, map);
 			}
 		}
 	}
@@ -52,6 +72,8 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 void init_game(uint32_t *map) {
     // gen_2d_map();
 	conv_2d_to_map(map2d, map);
+	draw_player(player_pos, player_angle, map);
+
 }
 // game loop
 void game(uint32_t *map) {

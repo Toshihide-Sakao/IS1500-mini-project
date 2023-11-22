@@ -15,6 +15,7 @@ LINKSCRIPT	:= p$(shell echo "$(DEVICE)" | tr '[:upper:]' '[:lower:]').ld
 CFLAGS		+= -ffreestanding -march=mips32r2 -msoft-float -Wa,-msoft-float
 ASFLAGS		+= -msoft-float
 LDFLAGS		+= -T $(LINKSCRIPT)
+LIBS		= -lm
 
 # Filenames
 ELFFILE		= $(PROGNAME).elf
@@ -70,6 +71,10 @@ $(DEPDIR):
 %.c.o: %.c envcheck | $(DEPDIR)
 	$(CC) $(CFLAGS) -c -MD -o $@ $<
 	@cp $*.c.d $(df).c.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.c.d >> $(df).c.P; $(RM) $*.c.d
+
+# Link object files
+$(ELFFILE): $(OBJFILES) envcheck
+	$(CC) $(LDFLAGS) -o $@ $(OBJFILES) $(LIBS)
 
 # Compile ASM files with C pre-processor directives
 %.S.o: %.S envcheck | $(DEPDIR)
