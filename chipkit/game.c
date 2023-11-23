@@ -22,7 +22,7 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-uint8_t map2d_overlay[16]; // kommer använda för att visa var man befinner sig i mappen vid sidan.
+uint8_t map2d_overlay[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // kommer använda för att visa var man befinner sig i mappen vid sidan.
 
 void set_pos(int x, int y, uint32_t *map)
 {
@@ -43,6 +43,20 @@ uint8_t get_pos(int x, int y, uint32_t *map)
 	uint32_t mask = 0;
 	mask = 1 << (y);
 	return (map[x] & mask) >> y;
+}
+
+uint8_t set_map2d_ol(int x, int y, uint8_t *map2d_overlay)
+{
+	uint8_t mask = 0;
+	mask = 1 << (y);
+	map2d_overlay[x] |= mask;
+}
+
+uint8_t get_map2d_ol(int x, int y, uint8_t *map2d_overlay)
+{
+	uint8_t mask = 0;
+	mask = 1 << (y);
+	return (map2d_overlay[x] & mask) >> y;
 }
 
 void draw_line(vec2 p1, vec2 p2, uint32_t *map)
@@ -78,13 +92,15 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 {
 	int i, j;
-	for (i = 0; i < 8 * 1; i++)
+	for (i = 0; i < 8 * 2; i++)
 	{
-		for (j = 0; j < 16 * 1; j++)
+		for (j = 0; j < 16 * 2; j++)
 		{
-			if (map2d[i / 1][j / 1] == 1)
+			// int tmp = get_map2d_ol(j / 2, i / 2, map2d_overlay);
+			int tmp = map2d[i / 2][j / 2];
+			if (tmp == 1)
 			{
-				set_pos(j+96, i+5, map);
+				set_pos(j+96, i+1, map);
 			}
 		}
 	}
@@ -104,12 +120,12 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 		int sw = getsw();
 		if (btns & 0b1) // btn2
 		{
-			move_player(player_pos, player_angle, map);
+			move_player(player_pos, *player_angle, map);
 		}
-		if (btns & 0b10) // btn3
-		{
-			move_player(player_pos, *player_angle + PI, map);
-		}
+		// if (btns & 0b10) // btn3
+		// {
+		// 	move_player(player_pos, *player_angle + PI, map);
+		// }
 		if (btns & 0b100) // btn4
 		{
 			rotate_player(player_angle);
@@ -120,7 +136,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 // game loop
 void game(uint32_t *map)
 {
-	draw_player(player_pos, player_angle, map, map2d);
+	draw_player(player_pos, player_angle, map, map2d, map2d_overlay);
 	player_inputs(&player_pos, &player_angle, map);
-	// conv_2d_to_map(map2d, map);
+	conv_2d_to_map(map2d, map);
 }
