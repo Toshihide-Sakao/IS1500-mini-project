@@ -106,13 +106,15 @@ uint8_t get_pos(int x, int y, uint32_t *map)
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 {
 	int i, j;
-	for (i = 0; i < 8 * 4; i++)
+	for (i = 0; i < 8 * 2; i++)
 	{
-		for (j = 0; j < 16 * 4; j++)
+		for (j = 0; j < 16 * 2; j++)
 		{
-			if (map2d[i / 4][j / 4] == 1)
+			// int tmp = get_map2d_ol(j / 2, i / 2, map2d_overlay);
+			int tmp = map2d[i / 2][j / 2];
+			if (tmp == 1)
 			{
-				set_pos(j, i, map);
+				set_pos(j+96, i+1, map);
 			}
 		}
 	}
@@ -150,10 +152,13 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 
 int main()
 {
+	conv_2d_to_map(map2d, map);
+	
 	// print_2d_map();
 	// conv_2d_to_map(map2d, map);
 	draw_player(player_pos, player_angle, map, map2d);
-	printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
+	// printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
+	conv_2d_to_map(map2d, map);
 
 	draw_map(map);
 

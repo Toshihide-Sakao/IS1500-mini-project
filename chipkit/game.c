@@ -136,7 +136,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 // game loop
 void game(uint32_t *map)
 {
-	draw_player(player_pos, player_angle, map, map2d, map2d_overlay);
+	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
 	conv_2d_to_map(map2d, map);
 }

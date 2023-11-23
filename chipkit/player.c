@@ -5,13 +5,14 @@
 #include "vector.h"
 #include "player.h"
 
-vec2 last_pos = {1000, 1000};
-vec2 last_dir = {1000, 1000};
+vec2 last_pos = {0, 0};
+vec2 last_dir = {0, 0};
 
 void draw_player(vec2 pos, double angle, uint32_t *map, uint8_t map2d[8][16])
 {
     clr_pos((int)last_pos.x, (int)last_pos.y, map);
     clr_pos((int)last_dir.x, (int)last_dir.y, map);
+    
     vec2 player_mpos = {(pos.x * 2) / 4 + 96, (pos.y *2) / 4 + 1};
     set_pos((int)player_mpos.x, (int)player_mpos.y, map);
     
