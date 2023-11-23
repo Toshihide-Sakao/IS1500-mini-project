@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include <time.h>
+
 #include "vector.h"
 #include "player.h"
 
@@ -23,8 +25,8 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-vec2 player_pos = { 35, 17 };
-double player_angle = PI * (3.0/4.0);
+vec2 player_pos = {16, 9};
+double player_angle = PI * (0.0 / 4.0);
 
 void draw_map(uint32_t *map)
 {
@@ -92,7 +94,7 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 			int tmp = map2d[i / 2][j / 2];
 			if (tmp == 1)
 			{
-				set_pos(j+96, i+1, map);
+				set_pos(j + 96, i + 1, map);
 			}
 		}
 	}
@@ -108,8 +110,11 @@ void draw_line(vec2 p1, vec2 p2, uint32_t *map)
 
 	for (i = 0; i < 100; i++)
 	{
-		if (x < 0 || x > 95 || y < 0 || y > 31) { break; } // not needed if we are not dumb
-		
+		if (x < 0 || x > 95 || y < 0 || y > 31)
+		{
+			break;
+		} // not needed if we are not dumb
+
 		set_pos((int)x, (int)y, map);
 		x += dx / 100;
 		y += dy / 100;
@@ -131,7 +136,7 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 int main()
 {
 	conv_2d_to_map(map2d, map);
-	
+
 	// print_2d_map();
 	// conv_2d_to_map(map2d, map);
 	draw_player(player_pos, player_angle, map, map2d);
@@ -140,12 +145,40 @@ int main()
 
 	draw_map(map);
 
-	// while (1)
-	// {
-	// 	system("clear");
-	// 	conv_2d_to_map(map2d, map);
-	// 	draw_map(map);
-	// }
+	while (1)
+	{
+		bool redraw = false;
+		char c = getchar();
+		if (c == 'w')
+		{
+			move_player(&player_pos, player_angle, map2d);
+			redraw = true;
+		}
+		if (c == 'a')
+		{
+			rotate_player(&player_angle);
+			redraw = true;
+		}
+
+		if (redraw)
+		{
+			system("clear");
+			conv_2d_to_map(map2d, map);
+			draw_map(map);
+		}
+
+		delay(100);
+	}
 
 	return 0;
+}
+
+void delay(int milliseconds)
+{
+	// Storing start time
+	clock_t start_time = clock();
+
+	// looping till required time is not achieved
+	while (clock() < start_time + milliseconds)
+		;
 }
