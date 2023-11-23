@@ -130,8 +130,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         }
 
         // choose shortest distance
-        disV = abs_tings(disV);
-        disH = abs_tings(disH);
+        disV = abs_myting(disV);
+        disH = abs_myting(disH);
         disT = smallest(disV, disH);
         // printf("disT: %f, disV: %f, disH: %f\n", disT, disV, disH);
 

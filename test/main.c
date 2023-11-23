@@ -147,17 +147,17 @@ int main()
 
 	while (1)
 	{
-		bool redraw = false;
+		int redraw = 0;
 		char c = getchar();
 		if (c == 'w')
 		{
 			move_player(&player_pos, player_angle, map2d);
-			redraw = true;
+			redraw = 1;
 		}
 		if (c == 'a')
 		{
 			rotate_player(&player_angle);
-			redraw = true;
+			redraw = 1;
 		}
 
 		if (redraw)
