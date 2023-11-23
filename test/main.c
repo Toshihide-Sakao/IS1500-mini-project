@@ -23,13 +23,13 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-vec2 player_pos = { 9, 17 };
-double player_angle = PI * (0/4.0);
+vec2 player_pos = { 35, 17 };
+double player_angle = PI * (3.0/4.0);
 
 void draw_map(uint32_t *map)
 {
 	// printf("draw map (rotation is wrong)\n");
-	for (int i = 0; i < 96; i++)
+	for (int i = 0; i < 128; i++)
 	{
 		print_binary(map[i], 31);
 	}
@@ -45,28 +45,6 @@ void print_binary(uint32_t x, int n)
 	}
 	printf("\n");
 }
-
-// void gen_map(uint32_t *map)
-// {
-// 	int i;
-// 	uint32_t edge = 0;
-// 	edge = ~0;
-// 	uint32_t normal = 0;
-// 	normal = 1 << 31;
-// 	normal |= 1;
-
-// 	for (i = 0; i < 96; i++)
-// 	{
-// 		if (i == 0 || i == 95)
-// 		{
-// 			map[i] = edge;
-// 		}
-// 		else
-// 		{
-// 			map[i] = normal;
-// 		}
-// 	}
-// }
 
 void print_2d_map()
 {
