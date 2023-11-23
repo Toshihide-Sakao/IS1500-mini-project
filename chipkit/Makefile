@@ -51,6 +51,8 @@ envcheck:
 		echo " * Make sure you have sourced the cross compiling environment *"; \
 		echo " * Do this by issuing:                                        *"; \
 		echo " * . /opt/mcb32tools/environment		                        *"; \
+		echo " * make 								                        *"; \
+		echo " * make install TTYDEV=/dev/ttyUSB0	                        *"; \
 		echo " **************************************************************"; \
 		echo ""; \
 		exit 1)

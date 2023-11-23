@@ -32,7 +32,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     int r, mx, my, dof;
     float rx, ry, ra, xo, yo, disT;
 
-    ra = (float)(player_angle - (PI / 6)); // fix back 30 degrees
+    ra = (float)(player_angle - (PI / 6.0)); // fix back 30 degrees
     ra = fix_angle(ra);
 
     for (r = 0; r < 10; r++)
@@ -142,7 +142,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         // printf("disT: %f\n", disT);
         
         float lineH = (4 * 32) / disT; // sq size * screen hight
-        lineH = smallest(lineH, 8.0 * 2.0); // max line height to half of screen
+        lineH = smallest(lineH, 31); // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
