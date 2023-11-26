@@ -25,7 +25,7 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-vec2 player_pos = {16, 9};
+vec2 player_pos = {50, 9};
 double player_angle = PI * (0.0 / 4.0);
 
 void draw_map(uint32_t *map)
@@ -135,6 +135,8 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 
 int main()
 {
+	system("clear");
+
 	conv_2d_to_map(map2d, map);
 
 	// print_2d_map();
@@ -145,30 +147,30 @@ int main()
 
 	draw_map(map);
 
-	while (1)
-	{
-		int redraw = 0;
-		char c = getchar();
-		if (c == 'w')
-		{
-			move_player(&player_pos, player_angle, map2d);
-			redraw = 1;
-		}
-		if (c == 'a')
-		{
-			rotate_player(&player_angle);
-			redraw = 1;
-		}
+	// while (1)
+	// {
+	// 	int redraw = 0;
+	// 	char c = getchar();
+	// 	if (c == 'w')
+	// 	{
+	// 		move_player(&player_pos, player_angle, map2d);
+	// 		redraw = 1;
+	// 	}
+	// 	if (c == 'a')
+	// 	{
+	// 		rotate_player(&player_angle);
+	// 		redraw = 1;
+	// 	}
 
-		if (redraw)
-		{
-			system("clear");
-			conv_2d_to_map(map2d, map);
-			draw_map(map);
-		}
+	// 	if (redraw)
+	// 	{
+	// 		system("clear");
+	// 		conv_2d_to_map(map2d, map);
+	// 		draw_map(map);
+	// 	}
 
-		delay(100);
-	}
+	// 	delay(100);
+	// }
 
 	return 0;
 }

@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:\\msys64\\opt\\mcb32tools\\include\\**",
-                "/opt/mcb32tools/include"
+                "/opt/mcb32tools/include",
+                "/usr/include/GL"
             ],
             "defines": [],
             "cStandard": "c17",
