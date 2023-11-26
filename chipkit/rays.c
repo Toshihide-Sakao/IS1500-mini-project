@@ -10,21 +10,39 @@
 
 float smallest(float a, float b)
 {
-    if (a < b) { return a; }
-    else { return b; }
+    if (a < b)
+    {
+        return a;
+    }
+    else
+    {
+        return b;
+    }
 }
 
 float fix_angle(float angle)
 {
-    if (angle < 0) { angle += 2 * PI; }
-    else if (angle > 2 * PI) { angle -= 2 * PI; }
+    if (angle < 0)
+    {
+        angle += 2 * PI;
+    }
+    else if (angle > 2 * PI)
+    {
+        angle -= 2 * PI;
+    }
     return angle;
 }
 
 float abs_myting(float x)
 {
-    if (x < 0) { return -x; }
-    else { return x; }
+    if (x < 0)
+    {
+        return -x;
+    }
+    else
+    {
+        return x;
+    }
 }
 
 void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], uint32_t *map)
@@ -38,7 +56,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     for (r = 0; r < 10; r++)
     {
         // Horizontal
-        dof = 0; // depth of field
+        dof = 0;                                                    // depth of field
         float disH = 1000000, hx = player_pos.x, hy = player_pos.y; // super high number
 
         float aTan = -1.0 / tan(ra);
@@ -67,7 +85,9 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         {
             mx = (int)(rx) / 4;
             my = (int)(ry) / 4;
-            if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) // hit wall
+
+            int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
+            if (check) // hit wall
             {
                 dof = 8;
                 hx = rx;
@@ -113,8 +133,9 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         {
             mx = (int)(rx) / 4;
             my = (int)(ry) / 4;
-            
-            if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) // hit wall
+
+            int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
+            if (check) // hit wall
             {
                 dof = 8;
                 vx = rx;
@@ -135,18 +156,18 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         disT = smallest(disV, disH);
         // printf("disT: %f, disV: %f, disH: %f\n", disT, disV, disH);
 
-        //make sure angle is between 0 and 2PI
+        // make sure angle is between 0 and 2PI
         float ca = fix_angle(player_angle - ra);
 
         disT = disT * cos(ca); // fix fisheye
         // printf("disT: %f\n", disT);
-        
+
         float lineH = (4 * 32) / disT; // sq size * screen hight
-        lineH = smallest(lineH, 31); // max line height to half of screen
+        lineH = smallest(lineH, 31);   // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
-        draw_rects(r*8, (int)lineO, r*8 +8, (int)(lineH + lineO), map);
+        draw_rects(r * 8, (int)lineO, r * 8 + 8, (int)(lineH + lineO), map);
 
         ra += PI / 30.0;
 

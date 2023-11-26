@@ -44,7 +44,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float aTan = -1.0 / tan(ra);
         if (ra > PI + 0.0001) // ray looking up
         {
-            ry = (((int)player_pos.y / 4) * 4) - 0.0001; // unsure could be 8, I think it is square size so 4
+            ry = (((int)player_pos.y / 4) * 4) - 0.01; // unsure could be 8, I think it is square size so 4
             rx = (player_pos.y - ry) * aTan + player_pos.x;
             yo = -4; // square size
             xo = -yo * aTan;
@@ -67,7 +67,9 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         {
             mx = (int)(rx) / 4;
             my = (int)(ry) / 4;
-            if ((mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0)) // hit wall
+
+            int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
+            if (check) // hit wall
             {
                 dof = 8;
                 hx = rx;
@@ -89,7 +91,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float nTan = -tan(ra);
         if (ra > P2 && ra < P3) // ray looking left
         {
-            rx = (((int)player_pos.x / 4) * 4) - 0.0001;
+            rx = (((int)player_pos.x / 4) * 4) - 0.01;
             ry = (player_pos.x - rx) * nTan + player_pos.y;
             xo = -4;
             yo = -xo * nTan;
@@ -116,7 +118,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             printf("rx: %f, ry: %f\n", rx, ry);
             printf("mx: %d, my: %d\n", mx, my);
             
-            if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) // hit wall
+            int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
+            if (check) // hit wall
             {
                 dof = 8;
                 vx = rx;
