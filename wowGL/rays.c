@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 
 #include "vector.h"
+#include "main.h"
 
 #define PI 3.14159265535
 #define sqS 4

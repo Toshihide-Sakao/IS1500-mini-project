@@ -7,8 +7,8 @@
 #include <math.h>
 #include <stdint.h>
 
-
 #include "vector.h"
+#include "player.h"
 
 #define PI 3.14159265535
 #define P2 PI / 2
@@ -35,6 +35,49 @@ uint8_t map2d[8][16] =
 
 vec2 player_pos = {50, 9};
 double player_angle = PI * (0.0 / 4.0);
+
+void set_pos(int x, int y)
+{
+    int xo = x * squareS;
+    int yo = y * squareS;
+    int offset = pixS;
+
+    glColor3f(1, 1, 1);
+
+    glBegin(GL_QUADS);
+    glVertex2i(xo + 2, yo + 2);
+    glVertex2i(xo + 2, offset + yo - 2);
+    glVertex2i(offset + xo - 2, offset + yo - 2);
+    glVertex2i(offset + xo - 2, yo + 2);
+    glEnd();
+}
+
+void draw_rects(int startX, int startY, int endX, int endY)
+{
+    for (int i = startX; i < endX; i++)
+    {
+        for (int j = startY; j < endY; j++)
+        {
+            set_pos(i, j);
+        }
+    }
+}
+
+void clr_pos(int x, int y) 
+{
+    int xo = x * squareS;
+    int yo = y * squareS;
+    int offset = pixS;
+
+    glColor3f(0.3, 0.3, 0.3);
+
+    glBegin(GL_QUADS);
+    glVertex2i(xo + 2, yo + 2);
+    glVertex2i(xo + 2, offset + yo - 2);
+    glVertex2i(offset + xo - 2, offset + yo - 2);
+    glVertex2i(offset + xo - 2, yo + 2);
+    glEnd();
+}
 
 void drawMap2D()
 {
@@ -89,52 +132,6 @@ void init()
 {
     glClearColor(0.3, 0.3, 0.3, 0);
     gluOrtho2D(0, 1024, 510, 0);
-}
-
-
-
-void set_pos(int x, int y)
-{
-    int xo = x * squareS;
-    int yo = y * squareS;
-    int offset = pixS;
-
-    glColor3f(1, 1, 1);
-
-    glBegin(GL_QUADS);
-    glVertex2i(xo + 2, yo + 2);
-    glVertex2i(xo + 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, yo + 2);
-    glEnd();
-}
-
-void draw_rects(int startX, int startY, int endX, int endY)
-{
-    for (int i = startX; i < endX; i++)
-    {
-        for (int j = startY; j < endY; j++)
-        {
-            set_pos(i, j);
-        }
-    }
-    
-}
-
-void clr_pos(int x, int y) 
-{
-    int xo = x * squareS;
-    int yo = y * squareS;
-    int offset = pixS;
-
-    glColor3f(0.3, 0.3, 0.3);
-
-    glBegin(GL_QUADS);
-    glVertex2i(xo + 2, yo + 2);
-    glVertex2i(xo + 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, yo + 2);
-    glEnd();
 }
 
 void display()

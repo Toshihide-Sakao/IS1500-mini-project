@@ -4,6 +4,8 @@
 
 #include "vector.h"
 #include "player.h"
+#include "main.h"
+#include "rays.h"
 
 #define PI 3.14159265535
 
