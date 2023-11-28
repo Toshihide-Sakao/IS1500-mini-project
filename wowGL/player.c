@@ -5,6 +5,8 @@
 #include "vector.h"
 #include "player.h"
 
+#define PI 3.14159265535
+
 vec2 last_pos = {0, 0};
 vec2 last_dir = {0, 0};
 
@@ -18,7 +20,7 @@ void draw_player(vec2 pos, double angle, uint8_t map2d[8][16])
     
     // // draw line for player direction
     vec2 dir = {player_mpos.x + (cos(angle) * 2), player_mpos.y + (sin(angle) * 2)};
-    // set_pos((int)dir.x, (int)dir.y);
+    set_pos((int)dir.x, (int)dir.y);
 
     draw_rays_3d(pos, angle, map2d);
 
@@ -33,5 +35,19 @@ void move_player(vec2 *pos, double angle) {
 
 void rotate_player(double *angle){
     *angle += 0.05;
+    if (*angle < 0.0)
+    {
+        *angle += 2.0 * PI;
+        printf("fixed angle add: angle: %f\n", angle);
+    }
+    else if (*angle >= 2.0 * PI)
+    {
+        *angle -= 2.0 * PI;
+        printf("fixed angle minus: angle: %f\n", angle);
+    }
+    else
+    {
+        printf("no fix\n");
+    }
 }
 

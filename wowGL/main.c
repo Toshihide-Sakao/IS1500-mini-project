@@ -127,7 +127,7 @@ void clr_pos(int x, int y)
     int yo = y * squareS;
     int offset = pixS;
 
-    glColor3f(0, 0, 0);
+    glColor3f(0.3, 0.3, 0.3);
 
     glBegin(GL_QUADS);
     glVertex2i(xo + 2, yo + 2);
