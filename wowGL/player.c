@@ -38,16 +38,10 @@ void rotate_player(double *angle){
     if (*angle < 0.0)
     {
         *angle += 2.0 * PI;
-        printf("fixed angle add: angle: %f\n", angle);
     }
     else if (*angle >= 2.0 * PI)
     {
         *angle -= 2.0 * PI;
-        printf("fixed angle minus: angle: %f\n", angle);
-    }
-    else
-    {
-        printf("no fix\n");
     }
 }
 

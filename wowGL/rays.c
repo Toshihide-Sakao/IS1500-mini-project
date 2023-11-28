@@ -9,6 +9,8 @@
 #define sqS 4
 #define DOFLIMIT 8
 
+#define FOV PI / 3.0
+
 float smallest(float a, float b)
 {
     if (a < b)
@@ -26,16 +28,10 @@ float fix_angle(float angle)
     if (angle < 0.0)
     {
         angle += 2.0 * PI;
-        printf("fixed angle add: angle: %f\n", angle);
     }
     else if (angle >= 2.0 * PI)
     {
         angle -= 2.0 * PI;
-        printf("fixed angle minus: angle: %f\n", angle);
-    }
-    else
-    {
-        printf("no fix\n");
     }
 
     return angle;
@@ -58,12 +54,12 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
     int r, mx, my, dof;
     float rx, ry, ra, xo, yo, disT;
 
-    ra = (float)(player_angle - (PI / 6)); // fix back 30 degrees
+    ra = (float)(player_angle - (FOV / 2)); // fix back 30 degrees
     // ra = player_angle;
     // printf("first fix: ");
     ra = fix_angle(ra);
-
-    for (r = 0; r < 41; r++)
+    // printf("start ra: %f\n", ra);
+    for (r = 0; r < 90; r++)
     {
         // Horizontal
         dof = 0;                                                    // depth of field
@@ -136,7 +132,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
             xo = -4;
             yo = xo * Tan;
 
-            printf("left... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
+            // printf("left... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
         }
         else if (ra < PI / 2.0 || ra > 3.0 * PI / 2.0) // ray looking right
         {
@@ -146,7 +142,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
             xo = 4;
             yo = xo * Tan;
 
-            printf("right... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
+            // printf("right... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
         }
         else // looking up or down
         {
@@ -159,13 +155,13 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
         {
             mx = (int)(rx) / 4;
             my = (int)(ry) / 4;
-            printf("rx: %f, ry: %f, mx: %d, my: %d\n", rx, ry, mx, my);
+            // printf("rx: %f, ry: %f, mx: %d, my: %d\n", rx, ry, mx, my);
 
             int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
             // int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1);
             if (check) // hit wall
             {
-                printf("hit wall\n");
+                // printf("hit wall\n");
                 dof = DOFLIMIT;
                 vx = rx;
                 vy = ry;
@@ -173,7 +169,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
             }
             else
             {
-                printf("didnt hit wall\n");
+                // printf("didnt hit wall\n");
                 rx += xo;
                 ry += yo;
                 dof += 1;
@@ -183,16 +179,33 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
         // choose shortest distance
         disV = abs_myting(disV);
         disH = abs_myting(disH);
-        disT = smallest(disV, disH);
-        printf("disV: %f, ra: %f\n", disV, ra);
-        // printf("disT: %f, disV: %f, disH: %f\n", disT, disV, disH);
+        if (disH < disV)
+        {
+            rx = hx;
+            ry = hy;
+            disT = disH;
+        }
+        else
+        {
+            rx = vx;
+            ry = vy;
+            disT = disV;
+        }
+
+        // GLTINGS
+        glColor3f(1.0, 0.3, 0.3); // red
+        glLineWidth(10);
+        glBegin(GL_LINES);
+        glVertex2i((int)(player_pos.x / 2.0 + 96) * 8, (int)(player_pos.y / 2.0 + 1) * 8);
+        glVertex2i((rx / 2.0 + 96) * 8, (ry / 2.0 + 1) * 8);
+        glEnd();
 
         // make sure angle is between 0 and 2PI
-        printf("ca fix: ");
+        // printf("ca fix: ");
         float ca = fix_angle(player_angle - ra);
 
         disT = disT * cos(ca); // fix fisheye
-        // printf("disT: %f\n", disT);
+
 
         float lineH = (4 * 32) / disT; // sq size * screen hight
         lineH = smallest(lineH, 31);   // max line height to half of screen
@@ -200,29 +213,14 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
         int lineO = 16 - lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
 
-        // GLTINGS
-        glColor3f(1.0, 0.3, 0.3); // red
-        glLineWidth(10);
-        glBegin(GL_LINES);
-        glVertex2i((int)(player_pos.x / 2.0 + 96) * 8, (int)(player_pos.y / 2.0 + 1) * 8);
-        glVertex2i((hx / 2.0 + 96) * 8, (hy / 2.0 + 1) * 8);
-        glEnd();
+        draw_rects(r, (int)lineO, r + 1, (int)(lineH + lineO));
 
-        glColor3f(0.3, 1.0, 0.3); // green
-        glLineWidth(3);
-        glBegin(GL_LINES);
-        glVertex2i((int)(player_pos.x / 2.0 + 96) * 8, (int)(player_pos.y / 2.0 + 1) * 8);
-        glVertex2i((vx / 2.0 + 96) * 8, (vy / 2.0 + 1) * 8);
-        glEnd();
-
-        draw_rects(r * 2, (int)lineO, r * 2 + 2, (int)(lineH + lineO));
-
-        ra += PI / 30.0 / 4.0;
+        ra += FOV / 90.0;
+        // printf("diff: %f\n", PI / 3.0 / 40.0);
 
         // make sure angle is between 0 and 2PI
-        printf("last fix: ");
+        // printf("last fix: ");
         ra = fix_angle(ra);
-
-        printf("------------------------------------------------------------\n\n");
     }
+    // printf("last ra: %f\n", ra);
 }
