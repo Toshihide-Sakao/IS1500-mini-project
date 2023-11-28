@@ -2,7 +2,6 @@
 *.d
 
 # Object files
-*.o
 *.ko
 *.obj
 *.elf
@@ -84,3 +83,11 @@ dkms.conf
 *.exe
 *.out
 *.app
+
+.vscode/*
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix

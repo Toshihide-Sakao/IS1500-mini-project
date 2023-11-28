@@ -1,0 +1,1 @@
+void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16]);
