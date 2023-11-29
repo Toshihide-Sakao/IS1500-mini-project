@@ -6,9 +6,12 @@
 
 #define PI 3.14159265535
 
+uint32_t frame = 0;
+
 vec2 player_pos = {9, 17};
 double player_angle = PI * (0 / 4.0);
-uint8_t pic_num = 0;
+uint8_t pistol_num = 0;
+uint8_t shooting = 0;
 
 // x: 96, y: 32
 uint8_t map2d[8][16] =
@@ -84,12 +87,13 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 	}
 }
 
-void draw_pistol(uint32_t *map) {
+void draw_pistol(uint32_t *map)
+{
 	int i;
 	for (i = 0; i < 16; i++)
 	{
-		map[i + 38] &= ~pistol_borders[i];
-		set_column(38 + i, pistol[i + 15 * (pic_num % 4)], map);
+		map[38 + i] &= ~pistol_border[i];
+		set_column(38 + i, pistol[i + 15 * (pistol_num % 4)], map);
 	}
 }
 
@@ -112,6 +116,7 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 
 void init_game(uint32_t *map)
 {
+	frame = 0;
 	conv_2d_to_map(map2d, map);
 }
 
@@ -120,22 +125,22 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 	int btns = getbtns();
 	if (getbtn1())
 	{
-		move_player(player_pos, *player_angle + (PI / 2.0), map);
+		move_player(player_pos, *player_angle + (PI / 2.0), map, map2d);
 	}
 
 	if (btns != 0)
 	{
 		if (btns & 0b1) // btn2
 		{
-			move_player(player_pos, *player_angle, map);
+			move_player(player_pos, *player_angle, map, map2d);
 		}
 		if (btns & 0b10) // btn3
 		{
-			move_player(player_pos, *player_angle + PI, map);
+			move_player(player_pos, *player_angle + PI, map, map2d);
 		}
 		if (btns & 0b100) // btn4
 		{
-			move_player(player_pos, *player_angle + (PI * 3.0 / 2.0), map);
+			move_player(player_pos, *player_angle + (PI * 3.0 / 2.0), map, map2d);
 		}
 	}
 	int sw = getsw();
@@ -144,7 +149,11 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 	{
 		if (sw & 0b1) // sw1
 		{
-			// shoot
+			shooting = 1;
+		} 
+		else
+		{
+			shooting = 0;
 		}
 		if (sw & 0b10) // sw2
 		{
@@ -158,10 +167,15 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 			rotate_player(player_angle, -1);
 		}
 	}
+	else
+	{
+		shooting = 0;
+	}
+	
 }
 
 // game loop
-void game(uint32_t *map, uint32_t *frame)
+void game(uint32_t *map)
 {
 	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
@@ -169,11 +183,12 @@ void game(uint32_t *map, uint32_t *frame)
 
 	draw_pistol(map);
 
-	if ((int)frame % 100 == 0)
-	{
-		pic_num++;
-	}
-	
+	display_string(0, itoaconv((int)frame));
+	display_update_text_row(96, 4, 5, 0, map);
 
+	if ((int)frame % 2 == 0 && shooting)
+	{
+		pistol_num++;
+	}
 	frame++;
 }

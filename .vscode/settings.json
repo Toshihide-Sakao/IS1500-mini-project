@@ -4,7 +4,7 @@
         "magic_nums.h": "c",
         "type_traits": "c",
         "vector.h": "c",
-        "player.h": "c"
+        "chipkit_funcs.h": "c"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

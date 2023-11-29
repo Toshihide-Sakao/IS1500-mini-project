@@ -21,6 +21,8 @@
 #define crowOledMax 32	  // number of display rows
 #define cpagOledMax 4	  // number of display memory pages
 
+char textbuffer[4][16];
+
 static const uint8_t const font[] = {
 	0,
 	0,
@@ -1112,8 +1114,7 @@ const uint32_t const pistol[15 * 4] = {
 	0b01000000000000000000000000000000,
 	0b01010000000000000000000000000000,
 	0b00100000000000000000000000000000,
-	0, 0
-};
+	0, 0};
 
 const uint32_t const pistol_border[15] = {
 	0, 0, 0, 0,
@@ -1240,7 +1241,6 @@ void display_reset()
 
 void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t *map)
 {
-	// print_binary(font[30], 7);
 	int i, j, k;
 	int c;
 	for (i = 0; i < 4; i++)
@@ -1248,19 +1248,52 @@ void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t 
 		for (j = 0; j < amount_of_chars + 1; j++)
 		{
 			c = textbuffer[i][j];
+			if (c != 32)
+			{
+			}
+
 			if (c & 0x80)
 				continue;
 
 			for (k = 0; k < 8; k++)
 			{
+				int startX = x + j * 8 + k;
+				// map[startX] &= ~(255 << (i * 8));
 				if (i == selected_row)
 				{
-					set_8s_in_32(map, ~font[c * 8 + k], i, x + j * 8 + k);
+					set_8s_in_32(map, ~font[c * 8 + k], i, startX);
 				}
 				else
 				{
-					set_8s_in_32(map, font[c * 8 + k], i, x + j * 8 + k);
+					set_8s_in_32(map, font[c * 8 + k], i, startX);
 				}
+			}
+		}
+	}
+}
+
+void display_update_text_row(int x, int amount_of_chars, int selected_row, int row_to_change, uint32_t *map)
+{
+	int j, k;
+	int c;
+	for (j = 0; j < amount_of_chars + 1; j++)
+	{
+		c = textbuffer[row_to_change][j];
+
+		if (c & 0x80)
+			continue;
+
+		for (k = 0; k < 8; k++)
+		{
+			int startX = x + j * 8 + k;
+			map[startX] &= ~(255 << (row_to_change * 8));
+			if (row_to_change == selected_row)
+			{
+				set_8s_in_32(map, ~font[c * 8 + k], row_to_change, startX);
+			}
+			else
+			{
+				set_8s_in_32(map, font[c * 8 + k], row_to_change, startX);
 			}
 		}
 	}
@@ -1271,4 +1304,41 @@ void set_8s_in_32(uint32_t *map, uint8_t num, int line, int startX)
 	uint32_t mask = 0;
 	mask = num << (line * 8);
 	map[startX] |= mask;
+}
+
+#define ITOA_BUFSIZ (24)
+char *itoaconv(int num)
+{
+	register int i, sign;
+	static char itoa_buffer[ITOA_BUFSIZ];
+	static const char maxneg[] = "-2147483648";
+
+	itoa_buffer[ITOA_BUFSIZ - 1] = 0; /* Insert the end-of-string marker. */
+	sign = num;						  /* Save sign. */
+	if (num < 0 && num - 1 > 0)		  /* Check for most negative integer */
+	{
+		for (i = 0; i < sizeof(maxneg); i += 1)
+			itoa_buffer[i + 1] = maxneg[i];
+		i = 0;
+	}
+	else
+	{
+		if (num < 0)
+			num = -num;		 /* Make number positive. */
+		i = ITOA_BUFSIZ - 2; /* Location for first ASCII digit. */
+		do
+		{
+			itoa_buffer[i] = num % 10 + '0'; /* Insert next digit. */
+			num = num / 10;					 /* Remove digit from number. */
+			i -= 1;							 /* Move index to next empty position. */
+		} while (num > 0);
+		if (sign < 0)
+		{
+			itoa_buffer[i] = '-';
+			i -= 1;
+		}
+	}
+	/* Since the loop always sets the index i to the next empty position,
+	 * we must add 1 in order to return a pointer to the first occupied position. */
+	return (&itoa_buffer[i + 1]);
 }

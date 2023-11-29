@@ -58,7 +58,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     // printf("first fix: ");
     ra = fix_angle(ra);
     // printf("start ra: %f\n", ra);
-    for (r = 0; r < 45; r++)
+    for (r = 0; r < 30; r++)
     {
         // Horizontal
         dof = 0;                                                    // depth of field
@@ -176,6 +176,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         }
 
         // choose shortest distance
+        int choose_texture = 1;
         disV = abs_myting(disV);
         disH = abs_myting(disH);
         if (disH < disV)
@@ -189,6 +190,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             rx = vx;
             ry = vy;
             disT = disV;
+            choose_texture = 2;
         }
 
         // GLTINGS
@@ -211,10 +213,14 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
+        int col;
+        for (col = 0; col < 3; col++)
+        {
+            map[r * 3 + col] = 0;
+        }
+        draw_rects(r * 3, (int)lineO, r * 3 + choose_texture, (int)(lineH + lineO), map);
 
-        draw_rects(r * 2, (int)lineO, r * 2 + 2, (int)(lineH + lineO), map);
-
-        ra += FOV / 45.0;
+        ra += FOV / 30.0;
         // printf("diff: %f\n", PI / 3.0 / 40.0);
 
         // make sure angle is between 0 and 2PI

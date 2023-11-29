@@ -3,13 +3,10 @@
 #include "chipkit_funcs.h"
 #include "game.h"
 
-char textbuffer[4][16];
 uint32_t map[128];
 
 uint8_t game_state = 0;
 uint8_t selected = 1;
-
-uint32_t frame = 0;
 
 int main(void)
 {
@@ -58,10 +55,7 @@ int main(void)
 		}
 		else if (game_state == 1)
 		{
-			display_string(0, "HELL");
-			display_update_text(96, 4, map);
-
-			game(map, &frame);
+			game(map);
 		}
 		else if (game_state == 2) // leader board
 		{
@@ -103,14 +97,11 @@ void main_scr_input()
 			{
 				reset_textbuffer();
 				reset_map();
-				display_reset();
 				init_game(map);
 
 				selected = 5; // so nothing selected
 				game_state = 1;
 
-				frame = 0;
-				
 				delay(1000);
 			}
 			else if (selected == 2)
