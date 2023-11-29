@@ -9,6 +9,8 @@ uint32_t map[128];
 uint8_t game_state = 0;
 uint8_t selected = 1;
 
+uint32_t frame = 0;
+
 int main(void)
 {
 	/* Set up peripheral bus clock */
@@ -59,7 +61,7 @@ int main(void)
 			display_string(0, "HELL");
 			display_update_text(96, 4, map);
 
-			game(map);
+			game(map, &frame);
 		}
 		else if (game_state == 2) // leader board
 		{
@@ -106,6 +108,8 @@ void main_scr_input()
 
 				selected = 5; // so nothing selected
 				game_state = 1;
+
+				frame = 0;
 				
 				delay(1000);
 			}

@@ -8,6 +8,7 @@
 
 vec2 player_pos = {9, 17};
 double player_angle = PI * (0 / 4.0);
+uint8_t pic_num = 0;
 
 // x: 96, y: 32
 uint8_t map2d[8][16] =
@@ -88,7 +89,7 @@ void draw_pistol(uint32_t *map) {
 	for (i = 0; i < 16; i++)
 	{
 		map[i + 38] &= ~pistol_borders[i];
-		set_column(38 + i, pistol[i], map);
+		set_column(38 + i, pistol[i + 15 * (pic_num % 4)], map);
 	}
 }
 
@@ -160,11 +161,19 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 }
 
 // game loop
-void game(uint32_t *map)
+void game(uint32_t *map, uint32_t *frame)
 {
 	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
 	conv_2d_to_map(map2d, map);
 
 	draw_pistol(map);
+
+	if ((int)frame % 100 == 0)
+	{
+		pic_num++;
+	}
+	
+
+	frame++;
 }
