@@ -1,6 +1,8 @@
 static const uint8_t const font[128*8];
 const uint8_t const dog_icon[128];
 extern char textbuffer[4][16];
+const uint32_t const pistol[15 * 4];
+const uint32_t const pistol_borders[15 * 4];
 
 void delay(int cyc);
 uint8_t spi_send_recv(uint8_t data);

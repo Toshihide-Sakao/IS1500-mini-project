@@ -45,18 +45,9 @@ uint8_t get_pos(int x, int y, uint32_t *map)
 	return (map[x] & mask) >> y;
 }
 
-uint8_t set_map2d_ol(int x, int y, uint8_t *map2d_overlay)
+void set_column(int x, uint32_t val, uint32_t *map)
 {
-	uint8_t mask = 0;
-	mask = 1 << (y);
-	map2d_overlay[x] |= mask;
-}
-
-uint8_t get_map2d_ol(int x, int y, uint8_t *map2d_overlay)
-{
-	uint8_t mask = 0;
-	mask = 1 << (y);
-	return (map2d_overlay[x] & mask) >> y;
+	map[x] |= val;
 }
 
 void draw_line(vec2 p1, vec2 p2, uint32_t *map)
@@ -92,6 +83,15 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 	}
 }
 
+void draw_pistol(uint32_t *map) {
+	int i;
+	for (i = 0; i < 16; i++)
+	{
+		map[i + 38] &= ~pistol_borders[i];
+		set_column(38 + i, pistol[i], map);
+	}
+}
+
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 {
 	int i, j;
@@ -112,7 +112,6 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 void init_game(uint32_t *map)
 {
 	conv_2d_to_map(map2d, map);
-	// draw_player(player_pos, player_angle, map);
 }
 
 void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
@@ -166,4 +165,6 @@ void game(uint32_t *map)
 	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
 	conv_2d_to_map(map2d, map);
+
+	draw_pistol(map);
 }
