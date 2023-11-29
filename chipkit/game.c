@@ -13,6 +13,8 @@ double player_angle = PI * (0 / 4.0);
 uint8_t pistol_num = 0;
 uint8_t shooting = 0;
 
+uint8_t enemy_num = 0;
+
 // x: 96, y: 32
 uint8_t map2d[8][16] =
 	{
@@ -94,6 +96,16 @@ void draw_pistol(uint32_t *map)
 	{
 		map[38 + i] &= ~pistol_border[i];
 		set_column(38 + i, pistol[i + 15 * (pistol_num % 4)], map);
+	}
+}
+
+void draw_enemy(uint32_t *map)
+{
+	int i;
+	for (i = 0; i < 30; i++)
+	{
+		map[20 + i] &= ~enemy_border[i];
+		set_column(20 + i, enemy[i + 30 * (enemy_num % 5)], map);
 	}
 }
 
@@ -181,6 +193,7 @@ void game(uint32_t *map)
 	player_inputs(&player_pos, &player_angle, map);
 	conv_2d_to_map(map2d, map);
 
+	draw_enemy(map);
 	draw_pistol(map);
 
 	display_string(0, itoaconv((int)frame));
