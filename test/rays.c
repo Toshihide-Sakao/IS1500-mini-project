@@ -115,8 +115,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         {
             mx = (int)(rx) / 4;
             my = (int)(ry) / 4;
-            printf("rx: %f, ry: %f\n", rx, ry);
-            printf("mx: %d, my: %d\n", mx, my);
+            // printf("rx: %f, ry: %f\n", rx, ry);
+            // printf("mx: %d, my: %d\n", mx, my);
             
             int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
             if (check) // hit wall
@@ -138,7 +138,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         disV = abs_myting(disV);
         disH = abs_myting(disH);
         disT = smallest(disV, disH);
-        printf("disT: %f, disV: %f, disH: %f\n", disT, disV, disH);
+        // printf("disT: %f, disV: %f, disH: %f\n", disT, disV, disH);
 
         //make sure angle is between 0 and 2PI
         float ca = fix_angle(player_angle - ra);
@@ -150,7 +150,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         lineH = smallest(lineH, 31); // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
-        printf("lineH: %f, lineO: %d\n", lineH, lineO);
+        // printf("lineH: %f, lineO: %d\n", lineH, lineO);
         draw_rects(r*2, (int)lineO, r*2 +2, (int)(lineH + lineO), map);
 
         ra += PI / 30.0 / 4.0;

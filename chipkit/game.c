@@ -6,8 +6,8 @@
 
 #define PI 3.14159265535
 
-vec2 player_pos = { 9, 17 };
-double player_angle = PI * (0/4.0);
+vec2 player_pos = {9, 17};
+double player_angle = PI * (0 / 4.0);
 
 // x: 96, y: 32
 uint8_t map2d[8][16] =
@@ -69,8 +69,11 @@ void draw_line(vec2 p1, vec2 p2, uint32_t *map)
 
 	for (i = 0; i < 100; i++)
 	{
-		if (x < 0 || x > 95 || y < 0 || y > 31) { break; } // not needed if we are not dumb
-		
+		if (x < 0 || x > 95 || y < 0 || y > 31)
+		{
+			break;
+		} // not needed if we are not dumb
+
 		set_pos((int)x, (int)y, map);
 		x += dx / 100;
 		y += dy / 100;
@@ -100,7 +103,7 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 			int tmp = map2d[i / 2][j / 2];
 			if (tmp == 1)
 			{
-				set_pos(j+96, i+1, map);
+				set_pos(j + 96, i + 8, map);
 			}
 		}
 	}
@@ -115,20 +118,44 @@ void init_game(uint32_t *map)
 void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 {
 	int btns = getbtns();
+	if (getbtn1())
+	{
+		move_player(player_pos, *player_angle + (PI / 2.0), map);
+	}
+
 	if (btns != 0)
 	{
-		int sw = getsw();
 		if (btns & 0b1) // btn2
 		{
 			move_player(player_pos, *player_angle, map);
 		}
-		// if (btns & 0b10) // btn3
-		// {
-		// 	move_player(player_pos, *player_angle + PI, map);
-		// }
+		if (btns & 0b10) // btn3
+		{
+			move_player(player_pos, *player_angle + PI, map);
+		}
 		if (btns & 0b100) // btn4
 		{
-			rotate_player(player_angle);
+			move_player(player_pos, *player_angle + (PI * 3.0 / 2.0), map);
+		}
+	}
+	int sw = getsw();
+
+	if (sw != 0)
+	{
+		if (sw & 0b1) // sw1
+		{
+			// shoot
+		}
+		if (sw & 0b10) // sw2
+		{
+		}
+		if (sw & 0b100) // sw3
+		{
+			rotate_player(player_angle, 1);
+		}
+		if (sw & 0b1000) // sw4
+		{
+			rotate_player(player_angle, -1);
 		}
 	}
 }

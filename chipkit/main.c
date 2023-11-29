@@ -4,8 +4,10 @@
 #include "game.h"
 
 char textbuffer[4][16];
-uint32_t map[96];
-const uint8_t disp[512];
+uint32_t map[128];
+
+uint8_t game_state = 0;
+uint8_t selected = 1;
 
 int main(void)
 {
@@ -46,13 +48,101 @@ int main(void)
 	display_init();
 	display_reset();
 
-	init_game(map);
-
 	while (1)
 	{
-		game(map);
+		if (game_state == 0)
+		{
+			main_screen();
+		}
+		else if (game_state == 1)
+		{
+			display_string(0, "HELL");
+			display_update_text(96, 4, map);
+
+			game(map);
+		}
+		else if (game_state == 2) // leader board
+		{
+		}
+		else if (game_state == 3) // place to put in name (3 chars)
+		{
+		}
+
 		display_update(map);
 	}
 
 	return 0;
+}
+
+void main_screen()
+{
+	reset_map();
+
+	display_string(0, "Game of wtf");
+	display_string(1, "Start");
+	display_string(2, "Leaderboard");
+	display_string(3, "B4  B2");
+	display_update_text(10, 11, selected, map);
+
+	main_scr_input();
+
+	delay(500000);
+}
+
+void main_scr_input()
+{
+	int btns = getbtns();
+	if (btns != 0)
+	{
+		int sw = getsw();
+		if (btns & 0b1) // btn2
+		{
+			if (selected == 1)
+			{
+				reset_textbuffer();
+				reset_map();
+				display_reset();
+				init_game(map);
+
+				selected = 5; // so nothing selected
+				game_state = 1;
+				
+				delay(1000);
+			}
+			else if (selected == 2)
+			{
+				game_state = 2;
+			}
+		}
+		if (btns & 0b100) // btn4
+		{
+			selected++;
+			if (selected > 2)
+			{
+				selected = 1;
+			}
+		}
+	}
+}
+
+void reset_map()
+{
+	int i;
+	for (i = 0; i < 128; i++)
+	{
+		map[i] = 0;
+	}
+}
+
+void reset_textbuffer()
+{
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		int j;
+		for (j = 0; j < 16; j++)
+		{
+			textbuffer[i][j] = 0;
+		}
+	}
 }

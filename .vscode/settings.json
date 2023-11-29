@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "magic_nums.h": "c",
+        "type_traits": "c",
+        "vector.h": "c",
+        "player.h": "c"
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
+}
