@@ -204,7 +204,6 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
         // make sure angle is between 0 and 2PI
         // printf("ca fix: ");
         float ca = fix_angle(player_angle - ra);
-
         disT = disT * cos(ca); // fix fisheye
 
 
@@ -212,12 +211,11 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16])
         lineH = smallest(lineH, 31);   // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
-        // printf("lineH: %f, lineO: %d\n", lineH, lineO);
+        printf("lineH: %f, lineO: %d\n", lineH, lineO);
 
         draw_rects(r, (int)lineO, r + 1, (int)(lineH + lineO));
 
         ra += FOV / 90.0;
-        // printf("diff: %f\n", PI / 3.0 / 40.0);
 
         // make sure angle is between 0 and 2PI
         // printf("last fix: ");
