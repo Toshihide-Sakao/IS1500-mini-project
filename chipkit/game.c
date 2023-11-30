@@ -10,6 +10,9 @@ uint32_t frame = 0;
 
 vec2 player_pos = {9, 17};
 double player_angle = PI * (0 / 4.0);
+short player_life = 5;
+int player_score = 0;
+
 uint8_t pistol_num = 0;
 uint8_t shooting = 0;
 
@@ -129,6 +132,8 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 void init_game(uint32_t *map)
 {
 	frame = 0;
+	player_life = 5;
+	player_score = 0;
 	conv_2d_to_map(map2d, map);
 }
 
