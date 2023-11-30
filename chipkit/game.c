@@ -207,7 +207,11 @@ void game(uint32_t *map)
 	if ((int)frame % 2 == 0 && shooting)
 	{
 		pistol_num++;
+	}
+	if ((int)frame % 4 == 0)
+	{
 		enemy_num++;
 	}
+	
 	frame++;
 }

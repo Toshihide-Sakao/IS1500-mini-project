@@ -284,21 +284,25 @@ void name_input()
 }
 
 void sort_l_board() { // TODO:
-	// int i;
-	// for (i = 0; i < 4; i++) {
-	// 	int j;
-	// 	for (j = 0; j < 4; j++) {
-	// 		if (l_score[i] > l_score[j]) {
-	// 			int temp = l_score[i];
-	// 			l_score[i] = l_score[j];
-	// 			l_score[j] = temp;
+	int i;
+	for (i = 0; i < 4; i++) {
+		int j;
+		for (j = 0; j < 4; j++) {
+			if (l_score[i] > l_score[j]) {
+				int temp = l_score[i];
+				l_score[i] = l_score[j];
+				l_score[j] = temp;
 
-	// 			char *temp2 = l_name[i];
-	// 			l_name[i] = l_name[j];
-	// 			l_name[j] = temp2;
-	// 		}
-	// 	}
-	// }
+				char *temp2 = l_name[i];
+				int w;
+				for (w = 0; w < 3; w++)
+				{
+					l_name[i][w] = l_name[j][w];
+					l_name[j][w] = temp2[w];
+				}
+			}
+		}
+	}
 }
 
 void reset_map()
