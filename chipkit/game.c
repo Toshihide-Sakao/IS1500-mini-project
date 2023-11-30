@@ -105,7 +105,7 @@ void draw_enemy(uint32_t *map)
 	for (i = 0; i < 30; i++)
 	{
 		map[20 + i] &= ~enemy_border[i];
-		set_column(20 + i, enemy[i + 30 * (enemy_num % 5)], map);
+		set_column(20 + i, enemy[i + 30 * (enemy_num % 4)], map);
 	}
 }
 
@@ -202,6 +202,7 @@ void game(uint32_t *map)
 	if ((int)frame % 2 == 0 && shooting)
 	{
 		pistol_num++;
+		enemy_num++;
 	}
 	frame++;
 }

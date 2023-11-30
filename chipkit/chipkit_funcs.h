@@ -3,7 +3,7 @@ const uint8_t const dog_icon[128];
 extern char textbuffer[4][16];
 const uint32_t const pistol[15 * 4];
 const uint32_t const pistol_border[15];
-const uint32_t const enemy[30 * 5];
+const uint32_t const enemy[30 * 4];
 const uint32_t const enemy_border[30];
 
 void delay(int cyc);
