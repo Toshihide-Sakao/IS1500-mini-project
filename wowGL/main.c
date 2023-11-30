@@ -11,8 +11,6 @@
 #include "player.h"
 
 #define PI 3.14159265535
-#define P2 PI / 2
-#define P3 3 * PI / 2
 
 //-----------------------------MAP----------------------------------------------
 #define mapX 16  // map width

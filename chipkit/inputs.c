@@ -12,3 +12,8 @@ int getbtns(void)
     return (PORTD & 0xe0) >> 5;
     // . . . . . 0000 1110 0000
 }
+
+int getbtn1(void) // it is on first bit now
+{
+    return (PORTF & 0x2) >> 1;
+}
