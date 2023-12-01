@@ -23,7 +23,7 @@ uint8_t map2d[8][16] =
 	{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
 		{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
@@ -102,14 +102,20 @@ void draw_pistol(uint32_t *map)
 	}
 }
 
-void draw_enemy(uint32_t *map)
+void draw_enemy(int x, uint32_t *map)
 {
 	int i;
 	for (i = 0; i < 30; i++)
 	{
-		map[20 + i] &= ~enemy_border[i];
-		set_column(20 + i, enemy[i + 30 * (enemy_num % 4)], map);
+		map[x + i] &= ~enemy_border[i];
+		set_column(x + i, enemy[i + 30 * (enemy_num % 4)], map);
 	}
+}
+
+void draw_enemy_x(int x, int col, uint32_t *map)
+{
+	map[x] &= ~enemy_border[col];
+	set_column(x, enemy[col + 30 * (enemy_num % 4)], map);
 }
 
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
@@ -198,7 +204,7 @@ void game(uint32_t *map)
 	player_inputs(&player_pos, &player_angle, map);
 	conv_2d_to_map(map2d, map);
 
-	draw_enemy(map);
+	// draw_enemy(map);
 	draw_pistol(map);
 
 	display_string(0, itoaconv((int)frame));
