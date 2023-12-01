@@ -8,8 +8,8 @@
 
 uint32_t frame = 0;
 
-vec2 player_pos = {9, 17};
-double player_angle = PI * (0 / 4.0);
+vec2 player_pos = {50, 9};
+double player_angle = PI * (0.0 / 4.0);
 short player_life = 5;
 int player_score = 0;
 
@@ -23,10 +23,10 @@ uint8_t map2d[8][16] =
 	{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
-		{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
@@ -173,7 +173,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 		if (sw & 0b1) // sw1
 		{
 			shooting = 1;
-		} 
+		}
 		else
 		{
 			shooting = 0;
@@ -183,10 +183,26 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 		}
 		if (sw & 0b100) // sw3
 		{
+			if (*player_angle < 0.0)
+			{
+				*player_angle += 2.0 * PI;
+			}
+			else if (*player_angle >= 2.0 * PI)
+			{
+				*player_angle -= 2.0 * PI;
+			}
 			rotate_player(player_angle, 1);
 		}
 		if (sw & 0b1000) // sw4
 		{
+			if (*player_angle < 0.0)
+			{
+				*player_angle += 2.0 * PI;
+			}
+			else if (*player_angle >= 2.0 * PI)
+			{
+				*player_angle -= 2.0 * PI;
+			}
 			rotate_player(player_angle, -1);
 		}
 	}
@@ -194,7 +210,6 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 	{
 		shooting = 0;
 	}
-	
 }
 
 // game loop
@@ -218,6 +233,6 @@ void game(uint32_t *map)
 	{
 		enemy_num++;
 	}
-	
+
 	frame++;
 }

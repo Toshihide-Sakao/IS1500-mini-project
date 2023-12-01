@@ -1278,7 +1278,6 @@ const uint32_t const enemy_border[30] = {
 	0, 0
 };
 
-
 void delay(int cyc)
 {
 	int i;

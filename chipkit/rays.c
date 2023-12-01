@@ -10,6 +10,9 @@
 
 #define FOV PI / 3.0
 
+const uint8_t const enemy_dist[7] = {
+    30, 26, 21, 14, 11, 8, 7};
+
 float smallest(float a, float b)
 {
     if (a < b)
@@ -52,6 +55,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
 {
     int r, mx, my, dof, enemy_hit = 0, enemy_rendered = 0;
     float rx, ry, ra, xo, yo, disT, disEnemy;
+    uint8_t number_of_enem_rays = 0;
 
     ra = (float)(player_angle - (FOV / 2)); // fix back 30 degrees
     // ra = player_angle;
@@ -70,6 +74,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float disEnemyH = 1000000;                                  // super high number
 
         float Tan = tan(ra);
+
+        // Check if angle is pi/2 or 0/2pi (then division by 0 can happen)
 
         if (ra > PI + 0.001 && ra < 2.0 * PI - 0.001) // ray looking up
         {
@@ -114,6 +120,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 hx = rx;
                 hy = ry;
                 disH = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y);
+                // disH = (hx - player_pos.x) * cos(ra) - (hy - player_pos.y) * sin(ra);
             }
             else
             {
@@ -129,6 +136,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 // printf("enemy hit\n");
                 // printf("rx: %f, ry: %f, mx: %d, my: %d\n", rx, ry, mx, my);
                 disEnemyH = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
+                // disEnemyH = cos(ra) * (mx - (player_pos.x / 4)) - sin(ra) * (my - (player_pos.y / 4));
+
                 enemy_hit = 1;
             }
         }
@@ -180,6 +189,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 vx = rx;
                 vy = ry;
                 disV = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y);
+                // disV = ((double)vx - player_pos.x) * cos(ra) - ((double)vy - player_pos.y) * sin(ra);
             }
             else
             {
@@ -193,6 +203,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             {
                 // draw enemy on 3d game screen
                 disEnemyV = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
+                // disEnemyV = cos(ra) * (mx - (player_pos.x / 4)) - sin(ra) * (my - (player_pos.y / 4));
+
                 enemy_hit = 1;
             }
         }
@@ -215,8 +227,6 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             choose_texture = 2;
         }
 
-        disEnemy = smallest(disEnemyH, disEnemyV);
-
         // GLTINGS
         // glColor3f(1.0, 0.3, 0.3); // red
         // glLineWidth(10);
@@ -230,8 +240,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float ca = fix_angle(player_angle - ra);
         disT = disT * cos(ca); // fix fisheye
 
-        float lineH = 96 / disT; // sq size * screen hight
-        lineH = smallest(lineH, 31);   // max line height to half of screen
+        float lineH = 96 / disT;     // sq size * screen hight
+        lineH = smallest(lineH, 31); // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
@@ -242,16 +252,44 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         }
         draw_rects(r * 3, (int)lineO, r * 3 + choose_texture, (int)(lineH + lineO), map);
 
+        // disEnemy = smallest(disEnemyH, disEnemyV);
+        // number_of_enem_rays = enemy_dist[(int)disEnemy];
         // if enemy is hit
-        if (enemy_hit)
-        {
-            int o;
-            for (o = 0; o < 3; o++)
-            {
-                draw_enemy_x(r * 3 + o, enemy_rendered, map);
-                enemy_rendered++;
-            }
-        }
+        // if (enemy_hit && disEnemy < 7)
+        // {
+        //     number_of_enem_rays = enemy_dist[(int)disEnemy];
+
+        //     int o;
+        //     // printf("number_of_enem_rays: %d, disEnemy: %d\n", number_of_enem_rays, (int)disEnemy);
+        //     if (number_of_enem_rays > enemy_rendered)
+        //     {
+        //         // printf("enemy_rendered: %d, number_of_enem_rays: %d\n", enemy_rendered, number_of_enem_rays);
+        //         for (o = 0; o < 3; o++)
+        //         {
+        //             draw_enemy_x(r * 3 + o, (30 / (int)(number_of_enem_rays +1)) * enemy_rendered + 2, map);
+        //             enemy_rendered++;
+        //         }
+        //     }
+        // }
+
+        // enemy on 5,7
+        // d: 6 is    7, *3
+        //    5       8
+        //    4.6     9
+        //    4.35    10
+        //    3.75    11
+        //    3.3     12
+        //    3.04    13
+        //    3.74    14
+        //    2.77    15
+        //    2.62    16
+        //    2.5     17
+        //    2.3     18
+        //    2.2     19
+        //    2.1     20
+        //    1.95    22
+        //    1.8     24
+        // ------------------------------
 
         ra += FOV / 30.0;
         // printf("diff: %f\n", PI / 3.0 / 40.0);
