@@ -60,12 +60,17 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     // printf("first fix: ");
     ra = fix_angle(ra);
     // printf("start ra: %f\n", ra);
+
+    float CosPa = cos(player_angle);
+    float SinPa = sin(player_angle);
+
     for (r = 0; r < 30; r++)
     {
         // Horizontal
         dof = 0;                                                    // depth of field
         float disH = 1000000, hx = player_pos.x, hy = player_pos.y; // super high number
         float disEnemyH = 1000000;                                  // super high number
+
         float Tan = tan(ra);
 
         if (ra > PI + 0.001 && ra < 2.0 * PI - 0.001) // ray looking up
@@ -110,8 +115,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 dof = DOFLIMIT;
                 hx = rx;
                 hy = ry;
-                disH = (hx - player_pos.x) * cos(ra) - (hy - player_pos.y) * sin(ra);
-                // disH = cos(ra) * (rx - player_pos.x) - sin(ra) * (ry - player_pos.y);
+                // disH = (hx - player_pos.x) * cos(ra) - (hy - player_pos.y) * sin(ra); // maybe abs?
+                disH = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y);
                 // disH = (rx - player_pos.x) / sin(ra);
             }
             else
@@ -126,13 +131,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             {
                 // draw enemy on 3d game screen
                 printf("enemy hit\n");
-                disEnemyH = cos(ra) * (mx - (player_pos.x / 4)) - sin(ra) * (my - (player_pos.y / 4));
-                float test = sqrt(pow((mx - (player_pos.x / 4)), 2) + pow((my - (player_pos.y / 4)), 2)); // test
-                float test2 = (mx - (player_pos.x / 4)) * sin(ra); // test
+                disEnemyH = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
                 enemy_hit = 1;
-                enemy_rendered++;
-
-                printf("disEnemyH: %f, test: %f, ray angle: %f, mx: %d, my: %d\n", disEnemyH, test, ra, mx - (int)(player_pos.x / 4), my - (int)(player_pos.y / 4));
             }
         }
 
@@ -183,7 +183,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 vx = rx;
                 vy = ry;
                 // disV = ((double)vx - player_pos.x) * cos(ra) - ((double)vy - player_pos.y) * sin(ra);
-                disV = cos(ra) * (rx - player_pos.x) - sin(ra) * (ry - player_pos.y);
+                disV = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y);
                 // disV = (rx - player_pos.x) / cos(ra);
             }
             else
@@ -198,11 +198,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             {
                 // draw enemy on 3d game screen
                 printf("enemy hit\n");
-                disEnemyV = cos(ra) * (mx - (player_pos.x / 4)) - sin(ra) * (my - (player_pos.y / 4));
-                float test = sqrt(pow((mx - (player_pos.x / 4)), 2) + pow((my - (player_pos.y / 4)), 2));
+                disEnemyV = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
                 enemy_hit = 1;
-                enemy_rendered++;
-                printf("disEnemyV: %f, test: %f, mx: %d, my: %d\n", disEnemyV, test, mx - (int)(player_pos.x / 4), my - (int)(player_pos.y / 4));
             }
         }
 
@@ -224,6 +221,34 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             choose_texture = 2;
         }
 
+        disEnemy = smallest(disEnemyH, disEnemyV);
+
+        // DEBUG-----------------------
+        if (enemy_hit)
+        {
+            int delx = (int)(rx / 4) - (player_pos.x / 4);
+            int dely = (int)(ry / 4) - (player_pos.y / 4);
+            printf("disEnemy: %f, delx: %d, dely: %d\n", disEnemy, delx, dely);
+        }
+        // enemy on 5,7
+        // d: 6 is    7, *3
+        //    5       8
+        //    4.6     9
+        //    4.35    10
+        //    3.75    11
+        //    3.3     12
+        //    3.04    13
+        //    3.74    14
+        //    2.77    15
+        //    2.62    16
+        //    2.5     17
+        //    2.3     18
+        //    2.2     19
+        //    2.1     20
+        //    1.95    22
+        //    1.8     24
+        // ------------------------------
+
         // printf("xo: %f, yo: %f, disT: %f\n", (rx - player_pos.x), (ry - player_pos.y), disT);
 
         // GLTINGS
@@ -239,8 +264,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float ca = fix_angle(player_angle - ra);
         disT = disT * cos(ca); // fix fisheye
 
-        float lineH = (4 * 32) / disT; // sq size * screen hight
-        lineH = smallest(lineH, 32);   // max line height to half of screen
+        float lineH = 96 / disT;     // sq size * screen hight
+        lineH = smallest(lineH, 32); // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
@@ -252,7 +277,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             glLineWidth(10);
             glBegin(GL_LINES);
             glVertex2i((int)(r * 3) * 8, (int)lineO * 8);
-            glVertex2i((int)(r * 3) * 8 + 1, (int)lineO * 8 + 20);
+            glVertex2i((int)(r * 3) * 8 + 1, (int)lineO * 8 + 40);
             glEnd();
         }
 
