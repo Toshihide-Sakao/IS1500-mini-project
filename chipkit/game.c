@@ -264,9 +264,9 @@ game(uint32_t *map, short *player_life, int *player_score)
 	// draw_enemy(map);
 	draw_pistol(map);
 
-	display_string(0, itoaconv((int)*player_life));
+	display_string(0, (char *)itoaconv((int)*player_life));
 	display_update_text_row(96, 4, 5, 0, map);
-	display_string(3, itoaconv((int)*player_score));
+	display_string(3, (char *)itoaconv((int)*player_score));
 	display_update_text_row(96, 4, 5, 3, map);
 
 	if ((int)frame % 6 == 0 && shooting)

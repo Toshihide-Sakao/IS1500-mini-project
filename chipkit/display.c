@@ -1388,6 +1388,13 @@ void display_reset()
 	}
 }
 
+void set_8s_in_32(uint32_t *map, uint8_t num, int line, int startX)
+{
+	uint32_t mask = 0;
+	mask = num << (line * 8);
+	map[startX] |= mask;
+}
+
 void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t *map)
 {
 	int i, j, k;
@@ -1443,13 +1450,6 @@ void display_update_text_row(int x, int amount_of_chars, int selected_row, int r
 			}
 		}
 	}
-}
-
-void set_8s_in_32(uint32_t *map, uint8_t num, int line, int startX)
-{
-	uint32_t mask = 0;
-	mask = num << (line * 8);
-	map[startX] |= mask;
 }
 
 #define ITOA_BUFSIZ (24)
