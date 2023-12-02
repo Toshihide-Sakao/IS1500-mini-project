@@ -22,12 +22,12 @@ uint8_t enemy_num = 0;
 uint8_t map2d[8][16] =
 	{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 1, 1, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
 		{1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 1},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
@@ -112,6 +112,39 @@ void draw_enemy(int x, uint32_t *map)
 	}
 }
 
+void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
+{
+	// we are always keeping 7 pixels from the top and 3 from the bottom
+	// amount rem is the amount of pixels we are removing from the top and bottom
+	// so if we are removing 2 pixels from the top and 2 from the bottom, we are removing 4 pixels in total
+	// then amount_rem is 2.
+
+	// eg. rem = 3, ((1 << (32 - (3 + 7 + 3*2))) -1) << (3 + rem) =
+	// ((1 << (32 - (3 + 7 + rem*2))) - 1) == 2^(32 - (3 + 7 + rem*2)) - 1 == 0b111...111 (32 - (3 + 7 + rem*2)) 1's
+	// 0b111...111 << (3 + rem) == 0b111. ...1 1100 0000
+
+	int middle_mask = ((1 << (32 - (3 + 7 + amount_rem * 2))) - 1) << (3 + amount_rem);
+	// printf("middle mask: %x, rem: %d\n", middle_mask, amount_rem);
+
+	int tmp0 = enemy_border[col] & 0b111;
+	int tmp1 = (enemy_border[col] & middle_mask) >> amount_rem;
+	int tmp2 = (enemy_border[col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
+	// int tmp2 = enemy_border[col] & 0b1111 1110 0000 0000 0000 0000 0000 0000 >> (amount_rem*2);
+	int tmp_border = (tmp0 | tmp1 | tmp2) << (amount_rem);
+	// printf("b: tmp2 = %x & %x = %x then shift\n", enemy_border[col], 0b11111110000000000000000000000000, (enemy_border[col] & 0b11111110000000000000000000000000));
+	// printf("b: real_b; %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_border: %x\n", enemy_border[col], tmp0, tmp1, tmp2, tmp_border);
+
+	int enem_col = col + 30 * (enemy_num % 4);
+	tmp0 = enemy[enem_col] & 0b111;
+	tmp1 = (enemy[enem_col] & middle_mask) >> amount_rem;
+	tmp2 = (enemy[enem_col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
+	int tmp_enemy = (tmp0 | tmp1 | tmp2) << (amount_rem);
+	// printf("e: real_e: %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_enemy: %x\n", enemy[enem_col], tmp0, tmp1, tmp2, tmp_enemy);
+
+	map[x] &= ~tmp_border;
+	set_column(x, tmp_enemy, map);
+}
+
 void draw_enemy_x(int x, int col, uint32_t *map)
 {
 	map[x] &= ~enemy_border[col];
@@ -192,6 +225,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 				*player_angle -= 2.0 * PI;
 			}
 			rotate_player(player_angle, 1);
+			conv_2d_to_map(map2d, map);
 		}
 		if (sw & 0b1000) // sw4
 		{
@@ -204,6 +238,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 				*player_angle -= 2.0 * PI;
 			}
 			rotate_player(player_angle, -1);
+			conv_2d_to_map(map2d, map);
 		}
 	}
 	else
@@ -215,8 +250,6 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 // game loop
 void game(uint32_t *map)
 {
-	// conv_2d_to_map(map2d, map);
-
 	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
 

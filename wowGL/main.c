@@ -8,7 +8,6 @@
 
 #define PI 3.14159265535
 
-//-----------------------------MAP----------------------------------------------
 #define mapX 16  // map width
 #define mapY 8 // map height
 #define squareS 8  // map cube size
@@ -86,24 +85,15 @@ void drawMap2D()
             }
         }
     }
-} //-----------------------------------------------------------------------------
-
+}
 
 void Buttons(unsigned char key, int x, int y)
 {
     if (key == 'a')
     {
-        // pa += 5;
-        // pa = FixAng(pa);
-        // pdx = cos(degToRad(pa));
-        // pdy = -sin(degToRad(pa));
     }
     if (key == 'd')
     {
-        // pa -= 5;
-        // pa = FixAng(pa);
-        // pdx = cos(degToRad(pa));
-        // pdy = -sin(degToRad(pa));
     }
     if (key == 'w')
     {
@@ -111,8 +101,6 @@ void Buttons(unsigned char key, int x, int y)
     }
     if (key == 's')
     {
-        // px -= pdx * 5;
-        // py -= pdy * 5;
     }
     if (key == 'q')
     {
@@ -133,7 +121,6 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawMap2D();
     draw_player(player_pos, player_angle, map2d);
-    // drawRays2D();
     glutSwapBuffers();
 }
 
