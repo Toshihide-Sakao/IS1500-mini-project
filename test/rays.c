@@ -72,7 +72,6 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         // Horizontal
         dof = 0;                                                    // depth of field
         float disH = 1000000, hx = player_pos.x, hy = player_pos.y; // super high number
-        
 
         float disEnemyH = 1000000; // super high number
 
@@ -286,13 +285,38 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
 
             int o;
             // printf("number_of_enem_rays: %d, disEnemy: %d\n", number_of_enem_rays, (int)disEnemy);
-            if (number_of_enem_rays > enemy_rendered)
+            // TODO: fix scaling with enemy.
+            // printf("enemy_rendered: %d, number_of_enem_rays: %d\n", enemy_rendered, number_of_enem_rays);
+            if (number_of_enem_rays == 30 && enemy_rendered <= 28 * 2)
             {
+                float scale = 0.5;
+                for (o = 0; o < 3; o++)
+                {
+                    draw_enemy_x(r * 3 + o, (int)(scale * enemy_rendered), map);
+                    enemy_rendered++;
+                    printf("fat:  number_of_enem_rays: %d, enemy_rende: %d, index: %d\n", number_of_enem_rays, enemy_rendered, (int)(scale * enemy_rendered));
+                }
+            } 
+            else if (enemy_rendered == number_of_enem_rays - 3)
+            {
+                int sc = (int)((26 - number_of_enem_rays) / 2.0) / 2;
+                for (o = 0; o < 3; o++)
+                {
+                    draw_enemy_scalable(r * 3 + o, sc, 25 + o, map);
+                    enemy_rendered++;
+                    printf("last:  number_of_enem_rays: %d, index: %d\n", number_of_enem_rays, 27 + o);
+                }
+            }
+
+            else if (number_of_enem_rays > enemy_rendered)
+            {
+                int sc = (int)((26 - number_of_enem_rays) / 2.0) / 2;
                 // printf("enemy_rendered: %d, number_of_enem_rays: %d\n", enemy_rendered, number_of_enem_rays);
                 for (o = 0; o < 3; o++)
                 {
-                    draw_enemy_x(r * 3 + o, (30 / (int)(number_of_enem_rays + 1)) * enemy_rendered + 2, map);
+                    draw_enemy_scalable(r * 3 + o, sc, (int)((30.0 / (number_of_enem_rays + 1)) * enemy_rendered) + 2, map);
                     enemy_rendered++;
+                    printf("not:   number_of_enem_rays: %d, enemy_rende: %d, index: %d\n", number_of_enem_rays, enemy_rendered, (int)((30.0 / (number_of_enem_rays + 1)) * enemy_rendered) + 2);
                 }
             }
         }

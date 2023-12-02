@@ -35,6 +35,10 @@ void move_player(vec2 *pos, double angle, uint32_t *map, uint8_t map2d[8][16])
         pos->x = nx;
         pos->y = ny;
     }
+    else
+    {
+        conv_2d_to_map(map2d, map);
+    }
 }
 
 void rotate_player(double *angle, int whichway)
