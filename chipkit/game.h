@@ -3,4 +3,4 @@ void gen_map(uint32_t *map);
 // inits game
 void init_game(uint32_t *map);
 // game loop
-void game(uint32_t *map);
+void game(uint32_t *map, short *player_life, int *player_score);
