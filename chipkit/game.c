@@ -57,26 +57,26 @@ void set_column(int x, uint32_t val, uint32_t *map)
 	map[x] |= val;
 }
 
-void draw_line(vec2 p1, vec2 p2, uint32_t *map)
-{
-	int i;
-	double dx = p2.x - p1.x;
-	double dy = p2.y - p1.y;
-	double x = p1.x;
-	double y = p1.y;
+// void draw_line(vec2 p1, vec2 p2, uint32_t *map)
+// {
+// 	int i;
+// 	double dx = p2.x - p1.x;
+// 	double dy = p2.y - p1.y;
+// 	double x = p1.x;
+// 	double y = p1.y;
 
-	for (i = 0; i < 100; i++)
-	{
-		if (x < 0 || x > 95 || y < 0 || y > 31)
-		{
-			break;
-		} // not needed if we are not dumb
+// 	for (i = 0; i < 100; i++)
+// 	{
+// 		if (x < 0 || x > 95 || y < 0 || y > 31)
+// 		{
+// 			break;
+// 		} // not needed if we are not dumb
 
-		set_pos((int)x, (int)y, map);
-		x += dx / 100;
-		y += dy / 100;
-	}
-}
+// 		set_pos((int)x, (int)y, map);
+// 		x += dx / 100;
+// 		y += dy / 100;
+// 	}
+// }
 
 void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 {

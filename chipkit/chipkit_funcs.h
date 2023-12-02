@@ -1,5 +1,9 @@
-static const uint8_t const font[128*8];
-const uint8_t const dog_icon[128];
+// heart     128
+// blob1     129
+// blob2     130
+// downarrow 131
+// select    132
+static const uint8_t const font[133*8];
 extern char textbuffer[4][16];
 const uint32_t const pistol[15 * 4];
 const uint32_t const pistol_border[15];
