@@ -19,7 +19,7 @@ void draw_player(vec2 pos, double angle, uint32_t *map, uint8_t map2d[8][16])
     // // draw line for player direction
     vec2 dir = {player_mpos.x + (cos(angle) * 2), player_mpos.y + (sin(angle) * 2)};
     set_pos((int)dir.x, (int)dir.y, map);
-
+    
     draw_rays_3d(pos, angle, map2d, map);
 
     last_pos = player_mpos;

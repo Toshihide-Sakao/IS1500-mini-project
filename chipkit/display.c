@@ -1278,7 +1278,6 @@ const uint32_t const enemy_border[30] = {
 	0, 0
 };
 
-
 void delay(int cyc)
 {
 	int i;
@@ -1398,9 +1397,6 @@ void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t 
 		for (j = 0; j < amount_of_chars + 1; j++)
 		{
 			c = textbuffer[i][j];
-			if (c != 32)
-			{
-			}
 
 			if (c & 0x80)
 				continue;

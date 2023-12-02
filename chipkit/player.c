@@ -30,7 +30,7 @@ void move_player(vec2 *pos, double angle, uint32_t *map, uint8_t map2d[8][16])
 {
     double nx = pos->x + cos(angle) / 5;
     double ny = pos->y + sin(angle) / 5;
-    if (map2d[(int)ny / 4][(int)nx / 4] == 0)
+    if (map2d[(int)ny / 4][(int)nx / 4] != 1)
     {
         pos->x = nx;
         pos->y = ny;

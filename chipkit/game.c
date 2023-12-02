@@ -8,8 +8,8 @@
 
 uint32_t frame = 0;
 
-vec2 player_pos = {9, 17};
-double player_angle = PI * (0 / 4.0);
+vec2 player_pos = {50, 9};
+double player_angle = PI * (7.0 / 4.0);
 short player_life = 5;
 int player_score = 0;
 
@@ -26,7 +26,7 @@ uint8_t map2d[8][16] =
 		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
-		{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
@@ -102,14 +102,20 @@ void draw_pistol(uint32_t *map)
 	}
 }
 
-void draw_enemy(uint32_t *map)
+void draw_enemy(int x, uint32_t *map)
 {
 	int i;
 	for (i = 0; i < 30; i++)
 	{
-		map[20 + i] &= ~enemy_border[i];
-		set_column(20 + i, enemy[i + 30 * (enemy_num % 4)], map);
+		map[x + i] &= ~enemy_border[i];
+		set_column(x + i, enemy[i + 30 * (enemy_num % 4)], map);
 	}
+}
+
+void draw_enemy_x(int x, int col, uint32_t *map)
+{
+	map[x] &= ~enemy_border[col];
+	set_column(x, enemy[col + 30 * (enemy_num % 4)], map);
 }
 
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
@@ -167,7 +173,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 		if (sw & 0b1) // sw1
 		{
 			shooting = 1;
-		} 
+		}
 		else
 		{
 			shooting = 0;
@@ -177,10 +183,26 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 		}
 		if (sw & 0b100) // sw3
 		{
+			if (*player_angle < 0.0)
+			{
+				*player_angle += 2.0 * PI;
+			}
+			else if (*player_angle >= 2.0 * PI)
+			{
+				*player_angle -= 2.0 * PI;
+			}
 			rotate_player(player_angle, 1);
 		}
 		if (sw & 0b1000) // sw4
 		{
+			if (*player_angle < 0.0)
+			{
+				*player_angle += 2.0 * PI;
+			}
+			else if (*player_angle >= 2.0 * PI)
+			{
+				*player_angle -= 2.0 * PI;
+			}
 			rotate_player(player_angle, -1);
 		}
 	}
@@ -188,26 +210,30 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 	{
 		shooting = 0;
 	}
-	
 }
 
 // game loop
 void game(uint32_t *map)
 {
+	// conv_2d_to_map(map2d, map);
+
 	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
-	conv_2d_to_map(map2d, map);
 
-	draw_enemy(map);
+	// draw_enemy(map);
 	draw_pistol(map);
 
-	display_string(0, itoaconv((int)frame));
-	display_update_text_row(96, 4, 5, 0, map);
+	// display_string(0, itoaconv((int)frame));
+	// display_update_text_row(96, 4, 5, 0, map);
 
 	if ((int)frame % 2 == 0 && shooting)
 	{
 		pistol_num++;
+	}
+	if ((int)frame % 4 == 0)
+	{
 		enemy_num++;
 	}
+
 	frame++;
 }
