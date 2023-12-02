@@ -57,6 +57,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     float rx, ry, ra, xo, yo, disT, disEnemy;
     uint8_t number_of_enem_rays = 0;
 
+    char *debug = "d";
+
     ra = (float)(player_angle - (FOV / 2)); // fix back 30 degrees
     // ra = player_angle;
     // printf("first fix: ");
@@ -66,6 +68,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     float CosPa = cos(player_angle);
     float SinPa = sin(player_angle);
 
+    // for (r = 17; r < 18; r++)
     for (r = 0; r < 30; r++)
     {
         // Horizontal
@@ -73,9 +76,10 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float disH = 1000000, hx = player_pos.x, hy = player_pos.y; // super high number
         float disEnemyH = 1000000;                                  // super high number
 
-        float Tan = tan(ra);
+        // float Tan = tan(ra);
+        float Tan = sin(ra) / cos(ra);
 
-        // Check if angle is pi/2 or 0/2pi (then division by 0 can happen)
+        // Check if angle is i*pi/2 or 0/2pi (then division by 0 can happen)
 
         if (ra > PI + 0.001 && ra < 2.0 * PI - 0.001) // ray looking up
         {
@@ -119,13 +123,13 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 dof = DOFLIMIT;
                 hx = rx;
                 hy = ry;
-                disH = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y);
+                disH = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y); // rx is wrong
                 // disH = (hx - player_pos.x) * cos(ra) - (hy - player_pos.y) * sin(ra);
             }
             else
             {
                 // printf("didnt hit wall\n");
-                rx += xo;
+                rx += xo; // xo is wrong
                 ry += yo;
                 dof += 1;
             }
@@ -240,10 +244,10 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         float ca = fix_angle(player_angle - ra);
         disT = disT * cos(ca); // fix fisheye
 
-        float lineH = 96 / disT;     // sq size * screen hight
+        float lineH = 96.0 / disT;   // sq size * screen hight
         lineH = smallest(lineH, 31); // max line height to half of screen
 
-        int lineO = 16 - lineH / 2; // half of screen - half of line height
+        int lineO = 16 - (int)lineH / 2; // half of screen - half of line height
         // printf("lineH: %f, lineO: %d\n", lineH, lineO);
         int col;
         for (col = 0; col < 3; col++)
@@ -252,25 +256,45 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         }
         draw_rects(r * 3, (int)lineO, r * 3 + choose_texture, (int)(lineH + lineO), map);
 
-        // disEnemy = smallest(disEnemyH, disEnemyV);
-        // number_of_enem_rays = enemy_dist[(int)disEnemy];
+        disEnemy = smallest(disEnemyH, disEnemyV);
         // if enemy is hit
-        // if (enemy_hit && disEnemy < 7)
-        // {
-        //     number_of_enem_rays = enemy_dist[(int)disEnemy];
+        if (enemy_hit && disEnemy < 7)
+        {
+            number_of_enem_rays = enemy_dist[(int)disEnemy];
 
-        //     int o;
-        //     // printf("number_of_enem_rays: %d, disEnemy: %d\n", number_of_enem_rays, (int)disEnemy);
-        //     if (number_of_enem_rays > enemy_rendered)
-        //     {
-        //         // printf("enemy_rendered: %d, number_of_enem_rays: %d\n", enemy_rendered, number_of_enem_rays);
-        //         for (o = 0; o < 3; o++)
-        //         {
-        //             draw_enemy_x(r * 3 + o, (30 / (int)(number_of_enem_rays +1)) * enemy_rendered + 2, map);
-        //             enemy_rendered++;
-        //         }
-        //     }
-        // }
+            int o;
+            // printf("number_of_enem_rays: %d, disEnemy: %d\n", number_of_enem_rays, (int)disEnemy);
+            // TODO: fix scaling with enemy.
+            if (enemy_rendered == number_of_enem_rays - 1)
+            {
+                for (o = 0; o < 3; o++)
+                {
+                    draw_enemy_x(r * 3 + o, 25 + o, map);
+                    enemy_rendered++;
+                }
+
+                if (r == 17)
+                {
+                    debug = itoaconv((int)50);
+                }
+            }
+
+            else if (number_of_enem_rays > enemy_rendered)
+            {
+                // printf("enemy_rendered: %d, number_of_enem_rays: %d\n", enemy_rendered, number_of_enem_rays);
+                for (o = 0; o < 3; o++)
+                {
+                    draw_enemy_x(r * 3 + o, (30 / (int)(number_of_enem_rays + 1)) * enemy_rendered + 2, map);
+                    enemy_rendered++;
+                }
+            }
+        }
+
+        if (r == 17)
+        {
+            display_string(0, debug);
+            display_update_text_row(96, 4, 5, 0, map);
+        }
 
         // enemy on 5,7
         // d: 6 is    7, *3

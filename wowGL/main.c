@@ -1,7 +1,3 @@
-//------------------------YouTube-3DSage----------------------------------------
-// Full video: https://www.youtube.com/watch?v=gYRrGTC7GtA
-// WADS to move player.
-
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <math.h>

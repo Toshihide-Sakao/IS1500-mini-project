@@ -9,7 +9,7 @@
 uint32_t frame = 0;
 
 vec2 player_pos = {50, 9};
-double player_angle = PI * (0.0 / 4.0);
+double player_angle = PI * (7.0 / 4.0);
 short player_life = 5;
 int player_score = 0;
 
@@ -215,15 +215,16 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 // game loop
 void game(uint32_t *map)
 {
+	// conv_2d_to_map(map2d, map);
+
 	draw_player(player_pos, player_angle, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
-	conv_2d_to_map(map2d, map);
 
 	// draw_enemy(map);
 	draw_pistol(map);
 
-	display_string(0, itoaconv((int)frame));
-	display_update_text_row(96, 4, 5, 0, map);
+	// display_string(0, itoaconv((int)frame));
+	// display_update_text_row(96, 4, 5, 0, map);
 
 	if ((int)frame % 2 == 0 && shooting)
 	{
