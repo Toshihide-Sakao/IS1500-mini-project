@@ -27,7 +27,6 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-
 static const uint8_t const font[] = {
 	0,
 	0,
@@ -1130,12 +1129,12 @@ const uint32_t const pistol_border[15] = {
 	0b11111111000000000000000000000000,
 	0b00001000000000000000000000000000,
 	0b00001000000000000000000000000000,
-	0, 0, 0
-};
+	0, 0, 0};
 
 const uint32_t const enemy[30 * 4] = {
 	// first
-	0, 0, 
+	0,
+	0,
 	0b00000111111110000000000000000000,
 	0b00001000000001100000000000000000,
 	0b00010000000000010000000000000000,
@@ -1162,9 +1161,11 @@ const uint32_t const enemy[30 * 4] = {
 	0b00010000000000010000000000000000,
 	0b00001000000011100000000000000000,
 	0b00000111111100000000000000000000,
-	0, 0,
+	0,
+	0,
 	// second
-	0, 0, 
+	0,
+	0,
 	0b00000111111111000000000000000000,
 	0b00001000000000110000000000000000,
 	0b00010000000000001000000000000000,
@@ -1191,9 +1192,11 @@ const uint32_t const enemy[30 * 4] = {
 	0b00010000000000001000000000000000,
 	0b00001000000001110000000000000000,
 	0b00000111111110000000000000000000,
-	0, 0,
+	0,
+	0,
 	// third
-	0, 0, 
+	0,
+	0,
 	0b00000111111111100000000000000000,
 	0b00001000000000011000000000000000,
 	0b00010000000000000100000000000000,
@@ -1220,9 +1223,11 @@ const uint32_t const enemy[30 * 4] = {
 	0b00010000000000000100000000000000,
 	0b00001000000000111000000000000000,
 	0b00000111111111000000000000000000,
-	0, 0,
+	0,
+	0,
 	// fourth
-	0, 0, 
+	0,
+	0,
 	0b00000111111111000000000000000000,
 	0b00001000000000110000000000000000,
 	0b00010000000000001000000000000000,
@@ -1249,11 +1254,12 @@ const uint32_t const enemy[30 * 4] = {
 	0b00010000000000001000000000000000,
 	0b00001000000001110000000000000000,
 	0b00000111111110000000000000000000,
-	0, 0,
+	0,
+	0,
 };
 
 const uint32_t const enemy_border[30] = {
-	0, 0, 
+	0, 0,
 	0b00000111111111100000000000000000,
 	0b00001111111111111000000000000000,
 	0b00011111111111111100000000000000,
@@ -1280,8 +1286,7 @@ const uint32_t const enemy_border[30] = {
 	0b00011111111111111100000000000000,
 	0b00001111111111111000000000000000,
 	0b00000111111111000000000000000000,
-	0, 0
-};
+	0, 0};
 
 char textbuffer[4][16];
 
@@ -1382,17 +1387,17 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 	// amount rem is the amount of pixels we are removing from the top and bottom
 	// so if we are removing 2 pixels from the top and 2 from the bottom, we are removing 4 pixels in total
 	// then amount_rem is 2.
-	
-	// eg. rem = 6, (1 << (3 + 3 + 6)) << 3 = 
+
+	// eg. rem = 6, (1 << (3 + 3 + 6)) << 3 =
 	// ((1 << (3 + 3 + amount_rem*2)) - 1) == 2^(3 + 3 + amount_rem*2) - 1 == 0b111...111 (3 + 3 + amount_rem*2) 1's
 	// 0b111...111 << 3 == 0b111...111000
-	
-	int middle_mask = (((1 << (32 - (3 + 7 + amount_rem*2))) - 1) << 3 + amount_rem);
+
+	int middle_mask = (((1 << (32 - (3 + 7 + amount_rem * 2))) - 1) << 3 + amount_rem);
 	// printf("middle mask: %x, rem: %d\n", middle_mask, amount_rem);
 
 	int tmp0 = enemy_border[col] & 0b111;
 	int tmp1 = (enemy_border[col] & middle_mask) >> amount_rem;
-	int tmp2 = (enemy_border[col] & 0b11111110000000000000000000000000) >> (amount_rem*2);
+	int tmp2 = (enemy_border[col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
 	// int tmp2 = enemy_border[col] & 0b1111 1110 0000 0000 0000 0000 0000 0000 >> (amount_rem*2);
 	int tmp_border = (tmp0 | tmp1 | tmp2) << (amount_rem);
 	// printf("b: tmp2 = %x & %x = %x then shift\n", enemy_border[col], 0b11111110000000000000000000000000, (enemy_border[col] & 0b11111110000000000000000000000000));
@@ -1401,7 +1406,7 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 	int enem_col = col + 30 * (enemy_num % 4);
 	tmp0 = enemy[enem_col] & 0b111;
 	tmp1 = (enemy[enem_col] & middle_mask) >> amount_rem;
-	tmp2 = (enemy[enem_col] & 0b11111110000000000000000000000000) >> (amount_rem*2);
+	tmp2 = (enemy[enem_col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
 	int tmp_enemy = (tmp0 | tmp1 | tmp2) << (amount_rem);
 	// printf("e: real_e: %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_enemy: %x\n", enemy[enem_col], tmp0, tmp1, tmp2, tmp_enemy);
 
@@ -1546,25 +1551,159 @@ void set_8s_in_32(uint32_t *map, uint8_t num, int line, int startX)
 	mask = num << (line * 8);
 	map[startX] |= mask;
 }
+// ----------------------------------------------------------
+// --------------------------------------------- LEADER -----------------------------
+char l_name[4][3];
+int l_score[4];
+
+#define ITOA_BUFSIZ (24)
+char *itoaconv(int num)
+{
+	register int i, sign;
+	static char itoa_buffer[ITOA_BUFSIZ];
+	static const char maxneg[] = "-2147483648";
+
+	itoa_buffer[ITOA_BUFSIZ - 1] = 0; /* Insert the end-of-string marker. */
+	sign = num;						  /* Save sign. */
+	if (num < 0 && num - 1 > 0)		  /* Check for most negative integer */
+	{
+		for (i = 0; i < sizeof(maxneg); i += 1)
+			itoa_buffer[i + 1] = maxneg[i];
+		i = 0;
+	}
+	else
+	{
+		if (num < 0)
+			num = -num;		 /* Make number positive. */
+		i = ITOA_BUFSIZ - 2; /* Location for first ASCII digit. */
+		do
+		{
+			itoa_buffer[i] = num % 10 + '0'; /* Insert next digit. */
+			num = num / 10;					 /* Remove digit from number. */
+			i -= 1;							 /* Move index to next empty position. */
+		} while (num > 0);
+		if (sign < 0)
+		{
+			itoa_buffer[i] = '-';
+			i -= 1;
+		}
+	}
+	/* Since the loop always sets the index i to the next empty position,
+	 * we must add 1 in order to return a pointer to the first occupied position. */
+	return (&itoa_buffer[i + 1]);
+}
+
+void sort_l_board()
+{ // TODO:
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		int j;
+		for (j = 0; j < 4; j++)
+		{
+			if (l_score[i] > l_score[j])
+			{
+				int temp = l_score[i];
+				l_score[i] = l_score[j];
+				l_score[j] = temp;
+
+				char temp2[3];
+				int w;
+				for (w = 0; w < 3; w++)
+				{
+					temp2[w] = l_name[i][w];
+					l_name[i][w] = l_name[j][w];
+					l_name[j][w] = temp2[w];
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		printf("%d: %d, %s\n", i+1, l_score[i], l_name[i]);
+	}
+}
+
+void gen_l_str(char *l_str, int i)
+{
+	l_str[0] = (char)((i + 1) + 48);
+	l_str[1] = '.';
+	l_str[2] = ' ';
+
+	int j;
+	for (j = 0; j < 3; j++)
+	{
+		l_str[j + 3] = l_name[i][j];
+	}
+	l_str[6] = ' ';
+	l_str[7] = ' ';
+	l_str[8] = ' ';
+	char *score_str = itoaconv(l_score[i]);
+	for (j = 0; j < 3; j++)
+	{
+		l_str[j + 9] = score_str[j];
+	}
+}
 
 int main()
 {
-	// system("clear");
 
-	conv_2d_to_map(map2d, map);
+	// -----------------------------------------
 
-	// print_2d_map();
+	// testing ---------------------
+	l_name[0][0] = 'Q';
+	l_name[0][1] = 'O';
+	l_name[0][2] = 'W';
+	l_score[0] = 1;
+
+	l_name[1][0] = 'Z';
+	l_name[1][1] = 'B';
+	l_name[1][2] = 'Z';
+	l_score[1] = 8;
+
+	// -----------------------------
+	sort_l_board();
+
+	char l1[14];
+	gen_l_str(l1, 0);
+	char l2[14];
+	gen_l_str(l2, 1);
+	char l3[14];
+	gen_l_str(l3, 2);
+
+	printf("sorted:\n");
+	printf("%s\n%s\n%s\n", l1, l2, l3);
+
+	// -----------------------------------------
+	l_name[3][0] = 'S';
+	l_name[3][1] = 'S';
+	l_name[3][2] = 'W';
+	l_score[3] = 10;
+
+	sort_l_board();
+
+	gen_l_str(l1, 0);
+	gen_l_str(l2, 1);
+	gen_l_str(l3, 2);
+	printf("sorted:\n");
+	printf("%s\n%s\n%s\n", l1, l2, l3);
+	// ------------------------------------------
+
 	// conv_2d_to_map(map2d, map);
-	draw_player(player_pos, player_angle, map, map2d);
-	// printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
-	// conv_2d_to_map(map2d, map);
 
-	// draw_pistol(map);
+	// // print_2d_map();
+	// // conv_2d_to_map(map2d, map);
+	// draw_player(player_pos, player_angle, map, map2d);
+	// // printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
+	// // conv_2d_to_map(map2d, map);
 
-	display_string(0, "HELL");
-	display_update_text_row(96, 4, 5, 0, map);
+	// // draw_pistol(map);
 
-	draw_map(map);
+	// display_string(0, "HELL");
+	// display_update_text_row(96, 4, 5, 0, map);
+
+	// draw_map(map);
 
 	// while (1)
 	// {

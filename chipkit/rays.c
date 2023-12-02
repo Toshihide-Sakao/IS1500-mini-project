@@ -51,7 +51,7 @@ float abs_myting(float x)
     }
 }
 
-void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], uint32_t *map)
+void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *player_score, uint8_t map2d[8][16], uint32_t *map)
 {
     int r, mx, my, dof, enemy_hit = 0, enemy_rendered = 0;
     float rx, ry, ra, xo, yo, disT, disEnemy;
@@ -68,6 +68,11 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
     float CosPa = cos(player_angle);
     float SinPa = sin(player_angle);
 
+    float disEnemyV = 1000000; // super high number
+    float disEnemyH = 1000000; // super high number
+
+    float killed = 0;
+
     // debug = itoaconv((int)(player_pos.x));
     // debug2 = itoaconv((int)(player_pos.y));
 
@@ -76,7 +81,6 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         // Horizontal
         dof = 0;                                                    // depth of field
         float disH = 1000000, hx = player_pos.x, hy = player_pos.y; // super high number
-        float disEnemyH = 1000000;                                  // super high number
 
         // float Tan = tan(ra);
         float Tan = sin(ra) / cos(ra);                // tan does not work in chipkit lmao!!!!!!!!!!!!!!!!!
@@ -118,24 +122,38 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             }
             else
             {
+                if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 2 && enemy_hit == 0)
+                {
+                    if (shot == 1 && (r >= 14 && r <= 15))
+                    {
+                        killed = 1;
+                        map2d[my][mx] = 0;
+                    }
+                    else
+                    {
+                        enemy_hit = 1;
+                        if (enemy_done == 1 && which_enemy_x != mx && which_enemy_y != my)
+                        {
+                            disEnemyH = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
+                            enemy_done = 0;
+                            enemy_rendered = 0;
+                            which_enemy_x = mx;
+                            which_enemy_y = my;
+                            // printf("H in enemydone, disEnemyH: %f, ex: %d, ey: %d\n", disEnemyH, which_enemy_x, which_enemy_y);
+                        }
+                        // printf("H: enemy hit, r: %d\n", r);
+                    }
+                }
+
                 rx += xo; // xo is wrong
                 ry += yo;
                 dof += 1;
-            }
-
-            if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 2 && enemy_hit == 0)
-            {
-                disEnemyH = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
-                which_enemy_x = mx;
-                which_enemy_y = my;
-                enemy_hit = 1;
             }
         }
 
         // Vertical
         dof = 0;
         float disV = 1000000, vx = player_pos.x, vy = player_pos.y; // super high number
-        float disEnemyV = 1000000;                                  // super high number
 
         if (ra > PI / 2.0 + 0.0001 && ra < 3.0 * PI / 2.0 - 0.0001) // ray looking left
         {
@@ -175,16 +193,33 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             }
             else
             {
+                if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 2 && enemy_hit == 0)
+                {
+                    if (shot == 1 && (r >= 14 && r <= 15))
+                    {
+                        killed = 1;
+                        map2d[my][mx] = 0;
+                    }
+                    else
+                    {
+                        // draw enemy on 3d game screen
+                        enemy_hit = 1;
+                        if (enemy_done == 1 && which_enemy_x != mx && which_enemy_y != my)
+                        {
+                            disEnemyV = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
+                            enemy_done = 0;
+                            enemy_rendered = 0;
+                            which_enemy_x = mx;
+                            which_enemy_y = my;
+                            // printf("V in enemydone, disEnemyV: %f, ex: %d, eY: %d\n", disEnemyV, which_enemy_x, which_enemy_y);
+                        }
+                        // printf("V: enemy hit, r: %d\n", r);
+                    }
+                }
+
                 rx += xo;
                 ry += yo;
                 dof += 1;
-            }
-
-            if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 2 && enemy_hit == 0)
-            {
-                // draw enemy on 3d game screen
-                disEnemyV = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
-                enemy_hit = 1;
             }
         }
 
@@ -223,12 +258,12 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
 
         // if enemy is hit
         disEnemy = smallest(disEnemyH, disEnemyV);
-        if (enemy_hit && disEnemy < 7)
+        if (enemy_hit && disEnemy < 7 && enemy_done == 0)
         {
+            // printf("disEnemy: %f\n", disEnemy);
             number_of_enem_rays = enemy_dist[(int)disEnemy];
 
             int o;
-            // TODO: done
             if (number_of_enem_rays == 30 && enemy_rendered <= 28 * 2)
             {
                 float scale = 0.5;
@@ -236,6 +271,12 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                 {
                     draw_enemy_x(r * 3 + o, (int)(scale * enemy_rendered), map);
                     enemy_rendered++;
+                }
+                if (enemy_rendered == 57)
+                {
+                    enemy_rendered = 0;
+                    enemy_done = 1;
+                    // printf("big: reset enemy_rendered r: %d\n", r);
                 }
             }
             else if (enemy_rendered == number_of_enem_rays - 3)
@@ -246,7 +287,11 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                     draw_enemy_scalable(r * 3 + o, sc, 25 + o, map);
                     enemy_rendered++;
                 }
-            } 
+
+                enemy_rendered = 0;
+                enemy_done = 1;
+                // printf("at limit: reset enemy_rendered r: %d\n", r);
+            }
             else if (number_of_enem_rays > enemy_rendered)
             {
                 int sc = (int)((26 - number_of_enem_rays) / 2.0);
@@ -255,20 +300,22 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                     draw_enemy_scalable(r * 3 + o, sc, (int)((30.0 / (number_of_enem_rays + 1)) * enemy_rendered) + 2, map);
                     enemy_rendered++;
                 }
+                if (enemy_rendered >= number_of_enem_rays)
+                {
+                    enemy_rendered = 0;
+                    enemy_done = 1;
+                    // printf("normal: reset enemy_rendered r: %d\n", r);
+                }
             }
-        }
-
-        // debug
-        if (r == 17)
-        {
-            display_string(0, debug);
-            display_update_text_row(96, 4, 5, 0, map);
-            display_string(3, debug2);
-            display_update_text_row(96, 4, 5, 3, map);
         }
 
         ra += FOV / 30.0;
         ra = fix_angle(ra);
         enemy_hit = 0;
+    }
+
+    if (killed == 1)
+    {
+        *player_score += 1;
     }
 }
