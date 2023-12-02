@@ -23,100 +23,98 @@ int curr_char = 0;
 short player_life = 5;
 int player_score = 10;
 
-int main(void)
+void gen_fake_leaderboard()
 {
-	/* Set up peripheral bus clock */
-	OSCCON &= ~0x180000;
-	OSCCON |= 0x080000;
+	// testing ---------------------
+	l_name[0][0] = 'Q';
+	l_name[0][1] = 'O';
+	l_name[0][2] = 'W';
+	l_score[0] = 1;
 
-	/* Set up output pins */
-	AD1PCFG = 0xFFFF;
-	ODCE = 0x0;
-	TRISECLR = 0xFF;
-	PORTE = 0x0;
+	l_name[1][0] = 'Z';
+	l_name[1][1] = 'B';
+	l_name[1][2] = 'Z';
+	l_score[1] = 8;
 
-	/* Output pins for display signals */
-	PORTF = 0xFFFF;
-	PORTG = (1 << 9);
-	ODCF = 0x0;
-	ODCG = 0x0;
-	TRISFCLR = 0x70;
-	TRISGCLR = 0x200;
+	l_name[2][0] = ' ';
+	l_name[2][1] = ' ';
+	l_name[2][2] = ' ';
 
-	/* Set up input pins */
-	TRISDSET = (1 << 8);
-	TRISFSET = (1 << 1);
+	l_name[3][0] = ' ';
+	l_name[3][1] = ' ';
+	l_name[3][2] = ' ';
 
-	/* Set up SPI as master */
-	SPI2CON = 0;
-	SPI2BRG = 15; // 8MHz I changed
-
-	/* Clear SPIROV*/
-	SPI2STATCLR &= ~0x40;
-	/* Set CKP = 1, MSTEN = 1; */
-	SPI2CON |= 0x60;
-
-	/* Turn on SPI */
-	SPI2CONSET = 0x8000;
-
-	display_init();
-	display_reset();
-
-	gen_fake_leaderboard();
-
-	while (1)
-	{
-		if (game_state == 0)
-		{
-			delay(10000);
-			main_screen();
-		}
-		else if (game_state == 1)
-		{
-			if (player_life <= 0)
-			{
-				delay(100000);
-				game_state = 3;
-			}
-			else
-			{
-				game(map, &player_life, &player_score);
-			}
-		}
-		else if (game_state == 2) // leader board
-		{
-			delay(10000);
-			leader_screen();
-		}
-		else if (game_state == 3) // dead screen
-		{
-			delay(10000);
-			dead_screen();
-		}
-		else if (game_state == 4) // place to put in name (3 chars)
-		{
-			delay(10000);
-			name_input();
-		}
-
-		display_update(map);
-	}
-
-	return 0;
+	// -----------------------------
 }
 
-void main_screen()
+void gen_l_str(char *l_str, int i)
 {
-	reset_map();
+	l_str[0] = (char)((i + 1) + 48);
+	l_str[1] = '.';
+	l_str[2] = ' ';
 
-	display_string(0, "Game of wtf");
-	display_string(1, "   Start");
-	display_string(2, "Leaderboard");
-	display_string(3, "B4       B2");
-	display_update_text(10, 11, selected, map);
+	int j;
+	for (j = 0; j < 3; j++)
+	{
+		l_str[j + 3] = l_name[i][j];
+	}
+	l_str[6] = ' ';
+	l_str[7] = ' ';
+	l_str[8] = ' ';
+	char *score_str = (char *)itoaconv(l_score[i]);
+	for (j = 0; j < 3; j++)
+	{
+		l_str[j + 9] = score_str[j];
+	}
+}
 
-	delay(500000);
-	main_scr_input();
+void sort_l_board() // TODO: fix
+{
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		int j;
+		for (j = 0; j < 4; j++)
+		{
+			if (l_score[i] > l_score[j])
+			{
+				int temp = l_score[i];
+				l_score[i] = l_score[j];
+				l_score[j] = temp;
+
+				char temp2[3];
+				int w;
+				for (w = 0; w < 3; w++)
+				{
+					temp2[w] = l_name[i][w];
+					l_name[i][w] = l_name[j][w];
+					l_name[j][w] = temp2[w];
+				}
+			}
+		}
+	}
+}
+
+void reset_map()
+{
+	int i;
+	for (i = 0; i < 128; i++)
+	{
+		map[i] = 0;
+	}
+}
+
+void reset_textbuffer()
+{
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		int j;
+		for (j = 0; j < 16; j++)
+		{
+			textbuffer[i][j] = 0;
+		}
+	}
 }
 
 void main_scr_input()
@@ -168,28 +166,18 @@ void main_scr_input()
 	}
 }
 
-void gen_fake_leaderboard()
+void main_screen()
 {
-	// testing ---------------------
-	l_name[0][0] = 'Q';
-	l_name[0][1] = 'O';
-	l_name[0][2] = 'W';
-	l_score[0] = 1;
+	reset_map();
 
-	l_name[1][0] = 'Z';
-	l_name[1][1] = 'B';
-	l_name[1][2] = 'Z';
-	l_score[1] = 8;
+	display_string(0, "Game of wtf");
+	display_string(1, "   Start");
+	display_string(2, "Leaderboard");
+	display_string(3, "B4       B2");
+	display_update_text(10, 11, selected, map);
 
-	l_name[2][0] = ' ';
-	l_name[2][1] = ' ';
-	l_name[2][2] = ' ';
-
-	l_name[3][0] = ' ';
-	l_name[3][1] = ' ';
-	l_name[3][2] = ' ';
-
-	// -----------------------------
+	delay(500000);
+	main_scr_input();
 }
 
 void leader_screen()
@@ -225,27 +213,6 @@ void leader_screen()
 	delay(500000);
 }
 
-void gen_l_str(char *l_str, int i)
-{
-	l_str[0] = (char)((i + 1) + 48);
-	l_str[1] = '.';
-	l_str[2] = ' ';
-
-	int j;
-	for (j = 0; j < 3; j++)
-	{
-		l_str[j + 3] = l_name[i][j];
-	}
-	l_str[6] = ' ';
-	l_str[7] = ' ';
-	l_str[8] = ' ';
-	char *score_str = itoaconv(l_score[i]);
-	for (j = 0; j < 3; j++)
-	{
-		l_str[j + 9] = score_str[j];
-	}
-}
-
 void dead_screen()
 {
 	curr_char = 0;
@@ -254,7 +221,7 @@ void dead_screen()
 
 	char score_str[12];
 	char *tmp2 = "  Score: ";
-	char *tmp1 = itoaconv((int)player_score);
+	char *tmp1 = (char*)itoaconv((int)player_score);
 	int i;
 	for (i = 0; i < 9; i++)
 	{
@@ -345,51 +312,84 @@ void name_input()
 	}
 }
 
-void sort_l_board()
-{ // TODO:
-	int i;
-	for (i = 0; i < 4; i++)
-	{
-		int j;
-		for (j = 0; j < 4; j++)
-		{
-			if (l_score[i] > l_score[j])
-			{
-				int temp = l_score[i];
-				l_score[i] = l_score[j];
-				l_score[j] = temp;
+int main(void)
+{
+	/* Set up peripheral bus clock */
+	OSCCON &= ~0x180000;
+	OSCCON |= 0x080000;
 
-				char temp2[3];
-				int w;
-				for (w = 0; w < 3; w++)
-				{
-					temp2[w] = l_name[i][w];
-					l_name[i][w] = l_name[j][w];
-					l_name[j][w] = temp2[w];
-				}
+	/* Set up output pins */
+	AD1PCFG = 0xFFFF;
+	ODCE = 0x0;
+	TRISECLR = 0xFF;
+	PORTE = 0x0;
+
+	/* Output pins for display signals */
+	PORTF = 0xFFFF;
+	PORTG = (1 << 9);
+	ODCF = 0x0;
+	ODCG = 0x0;
+	TRISFCLR = 0x70;
+	TRISGCLR = 0x200;
+
+	/* Set up input pins */
+	TRISDSET = (1 << 8);
+	TRISFSET = (1 << 1);
+
+	/* Set up SPI as master */
+	SPI2CON = 0;
+	SPI2BRG = 15; // 8MHz I changed
+
+	/* Clear SPIROV*/
+	SPI2STATCLR &= ~0x40;
+	/* Set CKP = 1, MSTEN = 1; */
+	SPI2CON |= 0x60;
+
+	/* Turn on SPI */
+	SPI2CONSET = 0x8000;
+
+	display_init();
+	display_reset();
+
+	gen_fake_leaderboard();
+
+	while (1)
+	{
+		if (game_state == 0)
+		{
+			delay(10000);
+			main_screen();
+		}
+		else if (game_state == 1)
+		{
+			if (player_life <= 0)
+			{
+				delay(100000);
+				game_state = 3;
+			}
+			else
+			{
+				game(map, &player_life, &player_score);
 			}
 		}
-	}
-}
-
-void reset_map()
-{
-	int i;
-	for (i = 0; i < 128; i++)
-	{
-		map[i] = 0;
-	}
-}
-
-void reset_textbuffer()
-{
-	int i;
-	for (i = 0; i < 4; i++)
-	{
-		int j;
-		for (j = 0; j < 16; j++)
+		else if (game_state == 2) // leader board
 		{
-			textbuffer[i][j] = 0;
+			delay(10000);
+			leader_screen();
 		}
+		else if (game_state == 3) // dead screen
+		{
+			delay(10000);
+			dead_screen();
+		}
+		else if (game_state == 4) // place to put in name (3 chars)
+		{
+			delay(10000);
+			name_input();
+		}
+
+		display_update(map);
 	}
+
+	return 0;
 }
