@@ -10,11 +10,10 @@ uint32_t frame = 0;
 
 vec2 player_pos = {50, 9};
 double player_angle = PI * (7.0 / 4.0);
-short player_life = 5;
-int player_score = 0;
 
 uint8_t pistol_num = 0;
 uint8_t shooting = 0;
+uint8_t shot = 0;
 
 uint8_t enemy_num = 0;
 
@@ -22,16 +21,15 @@ uint8_t enemy_num = 0;
 uint8_t map2d[8][16] =
 	{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 1, 1, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 1, 1, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
+		{1, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 1, 0, 1, 1, 1},
 		{1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 1},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
-uint8_t map2d_overlay[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // kommer använda för att visa var man befinner sig i mappen vid sidan.
 
 void set_pos(int x, int y, uint32_t *map)
 {
@@ -171,8 +169,6 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 void init_game(uint32_t *map)
 {
 	frame = 0;
-	player_life = 5;
-	player_score = 0;
 	conv_2d_to_map(map2d, map);
 }
 
@@ -247,25 +243,48 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 	}
 }
 
-// game loop
-void game(uint32_t *map)
+void enemy_attack_check(short *player_life)
 {
-	draw_player(player_pos, player_angle, map, map2d);
+	int mx = (int)(player_pos.x) / 4;
+	int my = (int)(player_pos.y) / 4;
+
+	if (map2d[my][mx] == 2)
+	{
+		map2d[my][mx] = 0;
+		*player_life -= 1;
+	}
+}
+
+// game loop
+game(uint32_t *map, short *player_life, int *player_score)
+{
+	draw_player(player_pos, player_angle, shot, player_score, map, map2d);
 	player_inputs(&player_pos, &player_angle, map);
 
 	// draw_enemy(map);
 	draw_pistol(map);
 
-	// display_string(0, itoaconv((int)frame));
-	// display_update_text_row(96, 4, 5, 0, map);
+	display_string(0, (char *)itoaconv((int)*player_life));
+	display_update_text_row(96, 4, 5, 0, map);
+	display_string(3, (char *)itoaconv((int)*player_score));
+	display_update_text_row(96, 4, 5, 3, map);
 
-	if ((int)frame % 2 == 0 && shooting)
+	if ((int)frame % 6 == 0 && shooting)
 	{
 		pistol_num++;
+		if (pistol_num % 4 == 3)
+		{
+			shot = 1;
+		}
+		else
+		{
+			shot = 0;
+		}
 	}
 	if ((int)frame % 4 == 0)
 	{
 		enemy_num++;
+		enemy_attack_check(player_life);
 	}
 
 	frame++;

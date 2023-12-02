@@ -8,7 +8,7 @@
 vec2 last_pos = {0, 0};
 vec2 last_dir = {0, 0};
 
-void draw_player(vec2 pos, double angle, uint32_t *map, uint8_t map2d[8][16])
+void draw_player(vec2 pos, double angle, uint8_t shot, int *score, uint32_t *map, uint8_t map2d[8][16])
 {
     clr_pos((int)last_pos.x, (int)last_pos.y, map);
     clr_pos((int)last_dir.x, (int)last_dir.y, map);
@@ -20,7 +20,7 @@ void draw_player(vec2 pos, double angle, uint32_t *map, uint8_t map2d[8][16])
     vec2 dir = {player_mpos.x + (cos(angle) * 2), player_mpos.y + (sin(angle) * 2)};
     set_pos((int)dir.x, (int)dir.y, map);
 
-    draw_rays_3d(pos, angle, map2d, map);
+    draw_rays_3d(pos, angle, shot, score, map2d, map);
 
     last_pos = player_mpos;
     last_dir = dir;
