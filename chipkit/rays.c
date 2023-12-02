@@ -237,6 +237,11 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                     draw_enemy_x(r * 3 + o, (int)(scale * enemy_rendered), map);
                     enemy_rendered++;
                 }
+                if (enemy_rendered == 57)
+                {
+                    enemy_rendered = 0;
+                    printf("reset enemy_rendered\n");
+                }
             }
             else if (enemy_rendered == number_of_enem_rays - 3)
             {
@@ -246,6 +251,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
                     draw_enemy_scalable(r * 3 + o, sc, 25 + o, map);
                     enemy_rendered++;
                 }
+
+                enemy_rendered = 0;
             } 
             else if (number_of_enem_rays > enemy_rendered)
             {
