@@ -8,10 +8,7 @@
 #include "player.h"
 
 #define PI 3.14159265535
-#define P2 PI / 2
-#define P3 3 * PI / 2
 
-//-----------------------------MAP----------------------------------------------
 #define mapX 16   // map width
 #define mapY 8    // map height
 #define squareS 8 // map cube size
@@ -37,17 +34,17 @@ double enemy_angle = PI * (0.0 / 4.0);
 
 void set_pos(int x, int y)
 {
-    int xo = x * squareS;
-    int yo = y * squareS;
+    int x_offset = x * squareS;
+    int y_offset = y * squareS;
     int offset = pixS;
 
     glColor3f(1, 1, 1);
 
     glBegin(GL_QUADS);
-    glVertex2i(xo + 2, yo + 2);
-    glVertex2i(xo + 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, yo + 2);
+    glVertex2i(x_offset + 2, y_offset + 2);
+    glVertex2i(x_offset + 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, y_offset + 2);
     glEnd();
 }
 
@@ -64,17 +61,17 @@ void draw_rects(int startX, int startY, int endX, int endY)
 
 void clr_pos(int x, int y)
 {
-    int xo = x * squareS;
-    int yo = y * squareS;
+    int x_offset = x * squareS;
+    int y_offset = y * squareS;
     int offset = pixS;
 
     glColor3f(0.3, 0.3, 0.3);
 
     glBegin(GL_QUADS);
-    glVertex2i(xo + 2, yo + 2);
-    glVertex2i(xo + 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, yo + 2);
+    glVertex2i(x_offset + 2, y_offset + 2);
+    glVertex2i(x_offset + 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, y_offset + 2);
     glEnd();
 }
 
@@ -91,7 +88,7 @@ void drawMap2D()
             }
         }
     }
-} //-----------------------------------------------------------------------------
+}
 
 spawn_enemies(uint8_t map2d[8][16])
 {
@@ -117,17 +114,9 @@ void Buttons(unsigned char key, int x, int y)
 {
     if (key == 'a')
     {
-        // pa += 5;
-        // pa = FixAng(pa);
-        // pdx = cos(degToRad(pa));
-        // pdy = -sin(degToRad(pa));
     }
     if (key == 'd')
     {
-        // pa -= 5;
-        // pa = FixAng(pa);
-        // pdx = cos(degToRad(pa));
-        // pdy = -sin(degToRad(pa));
     }
     if (key == 'w')
     {
@@ -135,8 +124,6 @@ void Buttons(unsigned char key, int x, int y)
     }
     if (key == 's')
     {
-        // px -= pdx * 5;
-        // py -= pdy * 5;
     }
     if (key == 'q')
     {
@@ -157,8 +144,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawMap2D();
     draw_player(player_pos, player_angle, map2d);
-    draw_enemy(enemy_pos, enemy_angle, map2d);
-    // drawRays2D();
+
     glutSwapBuffers();
 }
 

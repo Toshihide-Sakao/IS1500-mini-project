@@ -84,8 +84,6 @@ dkms.conf
 *.out
 *.app
 
-.vscode/*
-
 # Local History for Visual Studio Code
 .history/
 
