@@ -160,7 +160,7 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 			int tmp = map2d[i / 2][j / 2];
 			if (tmp == 1)
 			{
-				set_pos(j + 96, i + 8, map);
+				set_pos(j + 96, i, map);
 			}
 		}
 	}
@@ -255,18 +255,46 @@ void enemy_attack_check(short *player_life)
 	}
 }
 
+char* gen_life_str(short *life)
+{
+	char tmp[3];
+	char *str2 = (char *)itoaconv((int)*life);
+	tmp[0] = (char)124;
+	tmp[1] = str2[0];
+	tmp[2] = '\0';
+
+	return tmp;
+}
+
+char* gen_scr_str(int *score)
+{
+	char tmp[5];
+	char *str2 = (char *)itoaconv((int)*score);
+	int str_len = sizeof(str2) / sizeof(str2[0]);
+	tmp[0] = (char)125;
+	int i;
+	for (i = 0; i < str_len; i++)
+	{
+		tmp[i + 1] = str2[i];
+	}
+	tmp[i + str_len] = '\0';
+
+	return tmp;
+}
+
 // game loop
 game(uint32_t *map, short *player_life, int *player_score)
 {
 	draw_player(player_pos, player_angle, shot, player_score, map, map2d);
-	player_inputs(&player_pos, &player_angle, map);
-
-	// draw_enemy(map);
+    draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d);
 	draw_pistol(map);
 
-	display_string(0, (char *)itoaconv((int)*player_life));
-	display_update_text_row(96, 4, 5, 0, map);
-	display_string(3, (char *)itoaconv((int)*player_score));
+	player_inputs(&player_pos, &player_angle, map);
+
+
+	display_string(2, gen_scr_str(player_score));
+	display_update_text_row(96, 4, 5, 2, map);
+	display_string(3, gen_life_str(player_life));
 	display_update_text_row(96, 4, 5, 3, map);
 
 	if ((int)frame % 6 == 0 && shooting)

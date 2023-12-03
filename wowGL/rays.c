@@ -56,7 +56,7 @@ float abs_myting(float x)
 void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], uint8_t enemy_poses[32][2])
 {
     int r, mx, my, dof, enemy_hit = 0, enemy_rendered = 0;
-    float rx, ry, ra, xo, yo, disT, disEnemy;
+    float rx, ry, ra, x_offset, y_offset, dist, disEnemy;
     uint8_t number_of_enem_rays = 0;
 
     ra = (float)(player_angle - (FOV / 2)); // fix back 30 degrees
@@ -82,20 +82,20 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             float pmy = floor(player_pos.y / 4);
             ry = pmy * 4.0 - 0.001;
             rx = (ry - player_pos.y) / Tan + player_pos.x;
-            yo = -4;
-            xo = yo / Tan;
+            y_offset = -4;
+            x_offset = y_offset / Tan;
 
-            // printf("up... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
+            // printf("up... y_offset: %f, x_offset: %f, rx: %f, ry: %f, ra: %f\n", y_offset, x_offset, rx, ry, ra);
         }
         else if (ra < PI - 0.001 && ra > 0.001) // ray looking down
         {
             float pmy = floor(player_pos.y / 4);
             ry = pmy * 4.0 + 4;
             rx = (ry - player_pos.y) / Tan + player_pos.x;
-            yo = 4;
-            xo = yo / Tan;
+            y_offset = 4;
+            x_offset = y_offset / Tan;
 
-            // printf("down... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
+            // printf("down... y_offset: %f, x_offset: %f, rx: %f, ry: %f, ra: %f\n", y_offset, x_offset, rx, ry, ra);
         }
         else // ray looking left/right
         {
@@ -126,8 +126,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             else
             {
                 // printf("didnt hit wall\n");
-                rx += xo;
-                ry += yo;
+                rx += x_offset;
+                ry += y_offset;
                 dof += 1;
             }
 
@@ -150,20 +150,20 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             float pmx = floor(player_pos.x / 4);
             rx = pmx * 4.0 - 0.001;
             ry = (rx - player_pos.x) * Tan + player_pos.y;
-            xo = -4;
-            yo = xo * Tan;
+            x_offset = -4;
+            y_offset = x_offset * Tan;
 
-            // printf("left... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
+            // printf("left... y_offset: %f, x_offset: %f, rx: %f, ry: %f, ra: %f\n", y_offset, x_offset, rx, ry, ra);
         }
         else if (ra < PI / 2.0 || ra > 3.0 * PI / 2.0) // ray looking right
         {
             float pmx = floor(player_pos.x / 4);
             rx = pmx * 4.0 + 4.0;
             ry = (rx - player_pos.x) * Tan + player_pos.y;
-            xo = 4;
-            yo = xo * Tan;
+            x_offset = 4;
+            y_offset = x_offset * Tan;
 
-            // printf("right... yo: %f, xo: %f, rx: %f, ry: %f, ra: %f\n", yo, xo, rx, ry, ra);
+            // printf("right... y_offset: %f, x_offset: %f, rx: %f, ry: %f, ra: %f\n", y_offset, x_offset, rx, ry, ra);
         }
         else // looking up or down
         {
@@ -193,8 +193,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
             else
             {
                 // printf("didnt hit wall\n");
-                rx += xo;
-                ry += yo;
+                rx += x_offset;
+                ry += y_offset;
                 dof += 1;
             }
 
@@ -215,17 +215,17 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         {
             rx = hx;
             ry = hy;
-            disT = disH;
+            dist = disH;
         }
         else
         {
             rx = vx;
             ry = vy;
-            disT = disV;
+            dist = disV;
             choose_texture = 2;
         }
 
-        // printf("xo: %f, yo: %f, disT: %f\n", (rx - player_pos.x), (ry - player_pos.y), disT);
+        // printf("x_offset: %f, y_offset: %f, dist: %f\n", (rx - player_pos.x), (ry - player_pos.y), dist);
 
         // GLTINGS
         glColor3f(1.0, 0.3, 0.3); // red
@@ -238,9 +238,9 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t map2d[8][16], ui
         // make sure angle is between 0 and 2PI
         // printf("ca fix: ");
         float ca = fix_angle(player_angle - ra);
-        disT = disT * cos(ca); // fix fisheye
+        dist = dist * cos(ca); // fix fisheye
 
-        float lineH = 96 / disT;     // sq size * screen hight
+        float lineH = 96 / dist;     // sq size * screen hight
         lineH = smallest(lineH, 32); // max line height to half of screen
 
         int lineO = 16 - lineH / 2; // half of screen - half of line height

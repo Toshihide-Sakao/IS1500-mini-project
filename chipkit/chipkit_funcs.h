@@ -1,8 +1,8 @@
-// heart     128
-// blob1     129
-// blob2     130
-// downarrow 131
-// select    132
+// or line   123
+// heart     124
+// blob1     125
+// downarrow 126
+// select    127 and 122
 static const uint8_t const font[133*8];
 extern char textbuffer[4][16];
 const uint32_t const pistol[15 * 4];

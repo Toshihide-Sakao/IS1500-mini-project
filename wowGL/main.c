@@ -31,17 +31,17 @@ double player_angle = PI * (0.0 / 4.0);
 
 void set_pos(int x, int y)
 {
-    int xo = x * squareS;
-    int yo = y * squareS;
+    int x_offset = x * squareS;
+    int y_offset = y * squareS;
     int offset = pixS;
 
     glColor3f(1, 1, 1);
 
     glBegin(GL_QUADS);
-    glVertex2i(xo + 2, yo + 2);
-    glVertex2i(xo + 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, yo + 2);
+    glVertex2i(x_offset + 2, y_offset + 2);
+    glVertex2i(x_offset + 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, y_offset + 2);
     glEnd();
 }
 
@@ -58,17 +58,17 @@ void draw_rects(int startX, int startY, int endX, int endY)
 
 void clr_pos(int x, int y) 
 {
-    int xo = x * squareS;
-    int yo = y * squareS;
+    int x_offset = x * squareS;
+    int y_offset = y * squareS;
     int offset = pixS;
 
     glColor3f(0.3, 0.3, 0.3);
 
     glBegin(GL_QUADS);
-    glVertex2i(xo + 2, yo + 2);
-    glVertex2i(xo + 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, offset + yo - 2);
-    glVertex2i(offset + xo - 2, yo + 2);
+    glVertex2i(x_offset + 2, y_offset + 2);
+    glVertex2i(x_offset + 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, offset + y_offset - 2);
+    glVertex2i(offset + x_offset - 2, y_offset + 2);
     glEnd();
 }
 

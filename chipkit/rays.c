@@ -51,16 +51,16 @@ float abs_myting(float x)
     }
 }
 
-void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *player_score, uint8_t map2d[8][16], uint32_t *map)
+void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *player_score, uint32_t *map, uint8_t map2d[8][16])
 {
-    int r, mx, my, dof, enemy_hit = 0, enemy_rendered = 0;
-    float rx, ry, ra, xo, yo, disT, disEnemy;
+    int mx, my, dof, enemy_hit = 0, enemy_rendered = 0;
+    float rx, ry, ra, x_offset, y_offset, dist, disEnemy;
     uint8_t number_of_enem_rays = 0;
     int which_enemy_x = 1000, which_enemy_y = 1000;
     int enemy_done = 1;
 
-    char *debug = "d";
-    char *debug2 = "o";
+    // char *debug = "d";
+    // char *debug2 = "o";
 
     ra = (float)(player_angle - (FOV / 2)); // fix back 30 degrees
     ra = fix_angle(ra);
@@ -71,11 +71,11 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
     float disEnemyV = 1000000; // super high number
     float disEnemyH = 1000000; // super high number
 
-    float killed = 0;
+    int killed = 0;
 
     // debug = itoaconv((int)(player_pos.x));
     // debug2 = itoaconv((int)(player_pos.y));
-
+    int r;
     for (r = 0; r < 30; r++)
     {
         // Horizontal
@@ -89,16 +89,16 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
             float pmy = floor(player_pos.y / 4);
             ry = pmy * 4.0 - 0.001;
             rx = (ry - player_pos.y) / Tan + player_pos.x;
-            yo = -4;
-            xo = yo / Tan;
+            y_offset = -4;
+            x_offset = y_offset / Tan;
         }
         else if (ra < PI - 0.001 && ra > 0.001) // ray looking down
         {
             float pmy = floor(player_pos.y / 4);
             ry = pmy * 4.0 + 4;
             rx = (ry - player_pos.y) / Tan + player_pos.x;
-            yo = 4;
-            xo = yo / Tan;
+            y_offset = 4;
+            x_offset = y_offset / Tan;
         }
         else // ray looking left/right
         {
@@ -145,8 +145,8 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
                     }
                 }
 
-                rx += xo; // xo is wrong
-                ry += yo;
+                rx += x_offset;
+                ry += y_offset;
                 dof += 1;
             }
         }
@@ -160,16 +160,16 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
             float pmx = floor(player_pos.x / 4);
             rx = pmx * 4.0 - 0.001;
             ry = (rx - player_pos.x) * Tan + player_pos.y;
-            xo = -4;
-            yo = xo * Tan;
+            x_offset = -4;
+            y_offset = x_offset * Tan;
         }
         else if (ra < PI / 2.0 || ra > 3.0 * PI / 2.0) // ray looking right
         {
             float pmx = floor(player_pos.x / 4);
             rx = pmx * 4.0 + 4.0;
             ry = (rx - player_pos.x) * Tan + player_pos.y;
-            xo = 4;
-            yo = xo * Tan;
+            x_offset = 4;
+            y_offset = x_offset * Tan;
         }
         else // looking up or down
         {
@@ -217,13 +217,13 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
                     }
                 }
 
-                rx += xo;
-                ry += yo;
+                rx += x_offset;
+                ry += y_offset;
                 dof += 1;
             }
         }
 
-        // choose shortest distance
+        // choose shortest distance to wall and chooses texture
         int choose_texture = 1; // 1 = vertical, 2 = horizontal
         disV = abs_myting(disV);
         disH = abs_myting(disH);
@@ -231,39 +231,45 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
         {
             rx = hx;
             ry = hy;
-            disT = disH;
+            dist = disH;
         }
         else
         {
             rx = vx;
             ry = vy;
-            disT = disV;
+            dist = disV;
             choose_texture = 2;
         }
 
         // make sure angle is between 0 and 2PI
         float ca = fix_angle(player_angle - ra);
-        disT = disT * cos(ca); // fix fisheye
+        dist = dist * cos(ca); // fix fisheye
 
-        float lineH = 96.0 / disT;   // constant / disT
+        // Setting wall height
+        float lineH = 96.0 / dist;   // constant / dist
         lineH = smallest(lineH, 31); // max line height to half of screen
 
         int lineO = 16 - (int)lineH / 2; // half of screen - half of line height
+
+        // -----------------draw wall ------------------------
         int col;
-        for (col = 0; col < 3; col++)
+        for (col = 0; col < (3 - choose_texture); col++)
         {
-            map[r * 3 + col] = 0;
+            map[r * 3 + choose_texture + col] = 0; // clears wall from last frame (if it was another texture it could be left)
         }
-        draw_rects(r * 3, (int)lineO, r * 3 + choose_texture, (int)(lineH + lineO), map);
+        draw_rects(r * 3, (int)lineO, r * 3 + choose_texture, (int)(lineH + lineO), map); // draws the actual wall
+        // ---------------------------------------------------
 
         // if enemy is hit
         disEnemy = smallest(disEnemyH, disEnemyV);
+        // if the enemy is hit and the enemy is close enough to be rendered
         if (enemy_hit && disEnemy < 7 && enemy_done == 0)
         {
-            // printf("disEnemy: %f\n", disEnemy);
+            // sets how many rays the enemy will take up
             number_of_enem_rays = enemy_dist[(int)disEnemy];
 
             int o;
+            // if the enemy is very near and big and the enemy is not done
             if (number_of_enem_rays == 30 && enemy_rendered <= 28 * 2)
             {
                 float scale = 0.5;
@@ -272,28 +278,29 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
                     draw_enemy_x(r * 3 + o, (int)(scale * enemy_rendered), map);
                     enemy_rendered++;
                 }
-                if (enemy_rendered == 57)
+                if (enemy_rendered == 56) // it is done
                 {
                     enemy_rendered = 0;
                     enemy_done = 1;
                     // printf("big: reset enemy_rendered r: %d\n", r);
                 }
             }
-            else if (enemy_rendered == number_of_enem_rays - 3)
+            else if (enemy_rendered == number_of_enem_rays - 3) // normal enemy size and at end
             {
+                // sets how mmany to remove from top/bot
                 int sc = (int)((26 - number_of_enem_rays) / 2.0);
                 for (o = 0; o < 3; o++)
                 {
                     draw_enemy_scalable(r * 3 + o, sc, 25 + o, map);
                     enemy_rendered++;
                 }
-
+                // enemy is done after this
                 enemy_rendered = 0;
                 enemy_done = 1;
-                // printf("at limit: reset enemy_rendered r: %d\n", r);
             }
-            else if (number_of_enem_rays > enemy_rendered)
+            else if (number_of_enem_rays > enemy_rendered) // normal enemy size and not at end
             {
+                // sets how mmany to remove from top/bot
                 int sc = (int)((26 - number_of_enem_rays) / 2.0);
                 for (o = 0; o < 3; o++)
                 {
@@ -302,6 +309,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
                 }
                 if (enemy_rendered >= number_of_enem_rays)
                 {
+                    // DONE
                     enemy_rendered = 0;
                     enemy_done = 1;
                     // printf("normal: reset enemy_rendered r: %d\n", r);
@@ -309,11 +317,13 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
             }
         }
 
+        // adds to angle and fixes it
         ra += FOV / 30.0;
         ra = fix_angle(ra);
-        enemy_hit = 0;
+        enemy_hit = 0; // resets enemy hit
     }
 
+    // after every frame check if a enemy was killed
     if (killed == 1)
     {
         *player_score += 1;
