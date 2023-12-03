@@ -259,7 +259,11 @@ char* gen_life_str(short *life)
 {
 	char tmp[4];
 	char *str2 = (char *)itoaconv((int)*life);
-	return str5;
+	tmp[0] = (char)128;
+	tmp[1] = ' ';
+	tmp[2] = str2[0];
+	tmp[3] = '\0';
+	return tmp;
 }
 
 // game loop
@@ -271,7 +275,7 @@ game(uint32_t *map, short *player_life, int *player_score)
 
 	player_inputs(&player_pos, &player_angle, map);
 
-	display_string(2, (char *)itoaconv((int)*player_life));
+	display_string(2, gen_life_str(player_life));
 	display_update_text_row(96, 4, 5, 2, map);
 	display_string(3, (char *)itoaconv((int)*player_score));
 	display_update_text_row(96, 4, 5, 3, map);
