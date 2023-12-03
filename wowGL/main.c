@@ -1,9 +1,6 @@
-//------------------------YouTube-3DSage----------------------------------------
-// Full video: https://www.youtube.com/watch?v=gYRrGTC7GtA
-// WADS to move player.
-
 #include <stdlib.h>
-#include<GLUT/glut.h>
+// #include <GLUT/glut.h>
+#include <GL/glut.h>
 #include <math.h>
 #include <stdint.h>
 #include <time.h>
@@ -15,22 +12,22 @@
 #define P3 3 * PI / 2
 
 //-----------------------------MAP----------------------------------------------
-#define mapX 16  // map width
-#define mapY 8 // map height
-#define squareS 8  // map cube size
+#define mapX 16   // map width
+#define mapY 8    // map height
+#define squareS 8 // map cube size
 
 #define pixS 10 // map cube size
 
 uint8_t map2d[8][16] =
-	{
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
-		{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
+        {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
 vec2 player_pos = {50, 9};
@@ -65,9 +62,7 @@ void draw_rects(int startX, int startY, int endX, int endY)
     }
 }
 
-
-
-void clr_pos(int x, int y) 
+void clr_pos(int x, int y)
 {
     int xo = x * squareS;
     int yo = y * squareS;
@@ -88,7 +83,7 @@ void drawMap2D()
     int x, y;
     for (y = 0; y < mapY * 2; y++)
     {
-        for (x = 0; x < mapX *2; x++)
+        for (x = 0; x < mapX * 2; x++)
         {
             if (map2d[y / 2][x / 2] == 1)
             {
@@ -98,13 +93,17 @@ void drawMap2D()
     }
 } //-----------------------------------------------------------------------------
 
-    spawn_enemies(uint8_t map2d[8][16]) {
+spawn_enemies(uint8_t map2d[8][16])
+{
     srand(time(0));
     int randomNumberx = (rand() & 16);
     int randomNumbery = (rand() & 8);
-    if (map2d[randomNumbery][randomNumberx] == 0 ) {
+    if (map2d[randomNumbery][randomNumberx] == 0)
+    {
         map2d[randomNumbery][randomNumberx] = 2;
-    } else {
+    }
+    else
+    {
         while (map2d[randomNumbery][randomNumberx] == 1)
         {
             int randomNumberx = (rand() & 16);
@@ -112,10 +111,7 @@ void drawMap2D()
         }
         map2d[randomNumbery][randomNumberx] = 2;
     }
-
-    return map2d;
 }
-
 
 void Buttons(unsigned char key, int x, int y)
 {
@@ -146,7 +142,7 @@ void Buttons(unsigned char key, int x, int y)
     {
         rotate_player(&player_angle);
     }
-    
+
     glutPostRedisplay();
 } //-----------------------------------------------------------------------------
 

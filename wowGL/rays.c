@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
-#include<GLUT/glut.h>
+// #include<GLUT/glut.h>
+#include <GL/glut.h>
 
 #include "vector.h"
 #include "main.h"

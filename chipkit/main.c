@@ -1,4 +1,5 @@
 #include <pic32mx.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include "chipkit_funcs.h"
 #include "game.h"
