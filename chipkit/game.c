@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <stdlib.h>
+// #include <stdlib.h>
 #include <math.h>
 #include "chipkit_funcs.h"
 
@@ -7,7 +7,9 @@
 
 #define PI 3.14159265535
 
-uint32_t frame = 0;
+unsigned long int frame = 0;
+static unsigned long int next = 1;
+int diff = 250; // start with spawning oen enemy per 6sec
 
 vec2 player_pos = {50, 9};
 double player_angle = PI * (7.0 / 4.0);
@@ -16,21 +18,22 @@ uint8_t pistol_num = 0;
 uint8_t shooting = 0;
 uint8_t shot = 0;
 
-uint8_t enemy_num = 0;
+uint8_t enemy_anim_frame = 0;
+uint8_t enemy_poses[20][2];
+uint8_t amount_enemies = 0;
 
 // x: 96, y: 32
 uint8_t map2d[8][16] =
 	{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 1, 1, 0, 0, 0, 0, 1, 2, 0, 2, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1},
+		{1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 1, 0, 1, 1, 1},
-		{1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
+		{1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
-
 
 void set_pos(int x, int y, uint32_t *map)
 {
@@ -57,27 +60,6 @@ void set_column(int x, uint32_t val, uint32_t *map)
 {
 	map[x] |= val;
 }
-
-// void draw_line(vec2 p1, vec2 p2, uint32_t *map)
-// {
-// 	int i;
-// 	double dx = p2.x - p1.x;
-// 	double dy = p2.y - p1.y;
-// 	double x = p1.x;
-// 	double y = p1.y;
-
-// 	for (i = 0; i < 100; i++)
-// 	{
-// 		if (x < 0 || x > 95 || y < 0 || y > 31)
-// 		{
-// 			break;
-// 		} // not needed if we are not dumb
-
-// 		set_pos((int)x, (int)y, map);
-// 		x += dx / 100;
-// 		y += dy / 100;
-// 	}
-// }
 
 void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 {
@@ -107,7 +89,7 @@ void draw_enemy(int x, uint32_t *map)
 	for (i = 0; i < 30; i++)
 	{
 		map[x + i] &= ~enemy_border[i];
-		set_column(x + i, enemy[i + 30 * (enemy_num % 4)], map);
+		set_column(x + i, enemy[i + 30 * (enemy_anim_frame % 4)], map);
 	}
 }
 
@@ -133,7 +115,7 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 	// printf("b: tmp2 = %x & %x = %x then shift\n", enemy_border[col], 0b11111110000000000000000000000000, (enemy_border[col] & 0b11111110000000000000000000000000));
 	// printf("b: real_b; %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_border: %x\n", enemy_border[col], tmp0, tmp1, tmp2, tmp_border);
 
-	int enem_col = col + 30 * (enemy_num % 4);
+	int enem_col = col + 30 * (enemy_anim_frame % 4);
 	tmp0 = enemy[enem_col] & 0b111;
 	tmp1 = (enemy[enem_col] & middle_mask) >> amount_rem;
 	tmp2 = (enemy[enem_col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
@@ -147,7 +129,7 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 void draw_enemy_x(int x, int col, uint32_t *map)
 {
 	map[x] &= ~enemy_border[col];
-	set_column(x, enemy[col + 30 * (enemy_num % 4)], map);
+	set_column(x, enemy[col + 30 * (enemy_anim_frame % 4)], map);
 }
 
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
@@ -170,6 +152,30 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 void init_game(uint32_t *map)
 {
 	frame = 0;
+
+	// reseting stuff
+	uint8_t amount_enemies = 0;
+	int i, j;
+	for (i = 0; i < 30; i++)
+	{
+		for (j = 0; j < 2; j++)
+		{
+			enemy_poses[i][j] = 0;
+		}
+	}
+	for (i = 0; i < 8; i++)
+	{
+		for (j = 0; j < 16; j++)
+		{
+			if (map2d[i][j] == 2)
+			{
+				map2d[i][j] = 0;
+			}
+		}
+	}
+
+	vec2 player_pos = {50, 9};
+	double player_angle = PI * (4.0 / 4.0);
 	conv_2d_to_map(map2d, map);
 }
 
@@ -256,37 +262,107 @@ void enemy_attack_check(short *player_life)
 	}
 }
 
-spawn_enemies(uint8_t map2d[8][16])
+int rand(void) // RAND_MAX assumed to be 32767
 {
-    srand(time(0));
-    int randomNumberx = (rand() & 16);
-    int randomNumbery = (rand() & 8);
-    if (map2d[randomNumbery][randomNumberx] == 0)
-    {
-        map2d[randomNumbery][randomNumberx] = 2;
-    }
-    else
-    {
-        while (map2d[randomNumbery][randomNumberx] == 1)
-        {
-            int randomNumberx = (rand() & 16);
-            int randomNumbery = (rand() & 8);
-        }
-        map2d[randomNumbery][randomNumberx] = 2;
-    }
+	next = next * 1103515245 + 12345;
+	return (unsigned int)(next / 65536) % 32768;
 }
-char* gen_life_str(short *life)
+
+void srand(unsigned int seed)
 {
-	char tmp[3];
+	next = seed;
+}
+
+void spawn_enemies(uint32_t *map)
+{
+	srand(frame);
+	int randomNumberx = (rand() % 16);
+	int randomNumbery = (rand() % 8);
+	
+	if (map2d[randomNumbery][randomNumberx] == 0)
+	{
+		map2d[randomNumbery][randomNumberx] = 2;
+		enemy_poses[amount_enemies][0] = randomNumberx;
+		enemy_poses[amount_enemies][1] = randomNumbery;
+		amount_enemies++;
+		// set_pos(randomNumberx*4 + 96, (int)randomNumbery*4, map);
+	}
+	else
+	{
+		int tmp = map2d[randomNumbery][randomNumberx];
+		while (tmp == 1)
+		{
+			int randomNumberx = (rand() & 16);
+			int randomNumbery = (rand() & 8);
+
+			tmp = map2d[randomNumberx][randomNumbery];
+		}
+		map2d[randomNumbery][randomNumberx] = 2;
+		enemy_poses[amount_enemies][0] = randomNumberx;
+		enemy_poses[amount_enemies][1] = randomNumbery;
+		amount_enemies++;
+		// set_pos(randomNumberx*4 + 96, (int)randomNumbery*4, map);
+	}
+}
+
+void update_enemy_poses()
+{
+	int mpx = (int)(player_pos.x / 4.0);
+	int mpy = (int)(player_pos.y / 4.0);
+
+	int i;
+	for (i = 0; i < amount_enemies; i++)
+	{
+		int mx = enemy_poses[i][0];
+		int my = enemy_poses[i][1];
+
+		if (mx < mpx)
+		{
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 0;
+			enemy_poses[i][0] += 1;
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 2;
+		}
+		else if (mx > mpx)
+		{
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 0;
+			enemy_poses[i][0] -= 1;
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 2;
+		}
+		if (my < mpy)
+		{
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 0;
+			enemy_poses[i][1] += 1;
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 2;
+		}
+		else if (my > mpy)
+		{
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 0;
+			enemy_poses[i][1] -= 1;
+			map2d[(int)enemy_poses[i][1]][(int)enemy_poses[i][0]] = 2;
+		}
+	}
+}
+
+char *gen_life_str(short *life)
+{
+	char tmp[5];
 	char *str2 = (char *)itoaconv((int)*life);
+	int str_len = sizeof(str2) / sizeof(str2[0]);
 	tmp[0] = (char)124;
-	tmp[1] = str2[0];
-	tmp[2] = '\0';
+	int i;
+	for (i = 0; i < str_len; i++)
+	{
+		tmp[i + 1] = str2[i];
+	}
+	tmp[1 + str_len] = '\0';
+
+	// tmp[1] = str2[0];
+	// tmp[2] = '\0';
 
 	return tmp;
 }
 
-char* gen_scr_str(int *score)
+char *gen_scr_str(int *score)
 {
 	char tmp[5];
 	char *str2 = (char *)itoaconv((int)*score);
@@ -305,14 +381,15 @@ char* gen_scr_str(int *score)
 // game loop
 game(uint32_t *map, short *player_life, int *player_score)
 {
+	// conv_2d_to_map(map2d, map);
 	draw_player(player_pos, player_angle, shot, player_score, map, map2d);
-    draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d);
+	draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d);
 	draw_pistol(map);
 
 	player_inputs(&player_pos, &player_angle, map);
 
-
 	display_string(2, gen_scr_str(player_score));
+	// display_string(2, itoaconv((int)frame)); // debug
 	display_update_text_row(96, 4, 5, 2, map);
 	display_string(3, gen_life_str(player_life));
 	display_update_text_row(96, 4, 5, 3, map);
@@ -331,8 +408,19 @@ game(uint32_t *map, short *player_life, int *player_score)
 	}
 	if ((int)frame % 4 == 0)
 	{
-		enemy_num++;
+		enemy_anim_frame++;
 		enemy_attack_check(player_life);
+	}
+
+	if ((int)frame % diff == 0 && amount_enemies < 20)
+	{
+		spawn_enemies(map);
+		diff = (int)(diff / 1.03);
+	}
+
+	if ((int)frame % 80 == 0)
+	{
+		update_enemy_poses();
 	}
 
 	frame++;
