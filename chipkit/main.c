@@ -47,8 +47,9 @@ void gen_fake_leaderboard()
 	// -----------------------------
 }
 
-void gen_l_str(char *l_str, int i)
+char* gen_l_str(int i)
 {
+	char l_str[14];
 	l_str[0] = (char)((i + 1) + 48);
 	l_str[1] = '.';
 	l_str[2] = ' ';
@@ -60,15 +61,18 @@ void gen_l_str(char *l_str, int i)
 	}
 	l_str[6] = ' ';
 	l_str[7] = ' ';
-	l_str[8] = ' ';
 	char *score_str = (char *)itoaconv(l_score[i]);
-	for (j = 0; j < 3; j++)
+	int str_len = sizeof(score_str) / sizeof(score_str[0]);
+	for (j = 0; j < str_len; j++)
 	{
-		l_str[j + 9] = score_str[j];
+		l_str[j + 8] = score_str[j];
 	}
+	l_str[8 + str_len] = '\0';
+
+	return l_str;
 }
 
-void sort_l_board() // TODO: fix
+void sort_l_board()
 {
 	int i;
 	for (i = 0; i < 4; i++)
@@ -170,10 +174,11 @@ void main_screen()
 {
 	reset_map();
 
-	display_string(0, "Game of wtf");
+	display_string(0, " BLOB SHOOT");
 	display_string(1, "   Start");
 	display_string(2, "Leaderboard");
-	display_string(3, "B4       B2");
+	char* tmp = 	  "~B4  {  zB2"; // ~ is downarrow and z is select, { is |
+	display_string(3, tmp);
 	display_update_text(10, 11, selected, map);
 
 	delay(500000);
@@ -184,15 +189,11 @@ void leader_screen()
 {
 	sort_l_board();
 
-	gen_l_str(l1, 0);
-	gen_l_str(l2, 1);
-	gen_l_str(l3, 2);
-
 	display_string(0, "Leaderboard");
-	display_string(1, l1);
-	display_string(2, l2);
-	display_string(3, l3);
-	display_update_text(8, 13, selected, map);
+	display_string(1, gen_l_str(0));
+	display_string(2, gen_l_str(1));
+	display_string(3, gen_l_str(2));
+	display_update_text(0, 13, selected, map);
 
 	delay(100000);
 	int btns = getbtns();
@@ -219,23 +220,25 @@ void dead_screen()
 	reset_map();
 	reset_textbuffer();
 
-	char score_str[12];
-	char *tmp2 = "  Score: ";
-	char *tmp1 = (char*)itoaconv((int)player_score);
+	char score_str[13];
+	char *tmp1 = "  Score: ";
+	char *tmp2 = (char*)itoaconv((int)player_score);
 	int i;
 	for (i = 0; i < 9; i++)
 	{
 		score_str[i] = tmp1[i];
 	}
 
-	for (i = 0; i < 3; i++)
+	int str_len = sizeof(tmp2) / sizeof(tmp2[0]);
+	for (i = 0; i < str_len; i++)
 	{
 		score_str[i + 9] = tmp2[i];
 	}
+	score_str[i + str_len] = '\0';
 
 	display_string(0, "   YOU DIED");
 	display_string(1, score_str);
-	display_string(2, "B2 to continue");
+	display_string(2, "     zB2");
 
 	selected = 2;
 	display_update_text(10, 13, selected, map);
@@ -265,6 +268,7 @@ void name_input()
 	selected = 1;
 	display_string(0, "Enter name:");
 	display_string(1, curr_name);
+	display_string(2, "~B4     zB2");
 	display_update_text(10, 13, selected, map);
 
 	delay(100000);
