@@ -1,0 +1,3 @@
+. /opt/mcb32tools/environment
+make
+make install TTYDEV=/dev/ttyUSB0

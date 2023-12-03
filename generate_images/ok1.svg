@@ -1,0 +1,11 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" width="15" height="15">
+	<title>ok</title>
+	<defs>
+		<image  width="15" height="15" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPAQMAAAABGAcJAAAAAXNSR0IB2cksfwAAAANQTFRF////p8QbyAAAAAxJREFUeJxjYCABAAAALQABxdfAhgAAAABJRU5ErkJggg=="/>
+		<image  width="15" height="15" id="img2" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPAQMAAAABGAcJAAAAAXNSR0IB2cksfwAAAAZQTFRF////AAAAVcLTfgAAACxJREFUeJwVyMEJACAMALGAClqXcrSO7AhaOO4RaPSsRtrHPOI/xbUIhav8AWlsBN9VhFVaAAAAAElFTkSuQmCC"/>
+	</defs>
+	<style>
+	</style>
+	<use id="Layer 1" href="#img1" x="0" y="0"/>
+	<use id="2" href="#img2" x="0" y="2"/>
+</svg>
