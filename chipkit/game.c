@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include <math.h>
 #include "chipkit_funcs.h"
 
@@ -255,6 +256,25 @@ void enemy_attack_check(short *player_life)
 	}
 }
 
+spawn_enemies(uint8_t map2d[8][16])
+{
+    srand(time(0));
+    int randomNumberx = (rand() & 16);
+    int randomNumbery = (rand() & 8);
+    if (map2d[randomNumbery][randomNumberx] == 0)
+    {
+        map2d[randomNumbery][randomNumberx] = 2;
+    }
+    else
+    {
+        while (map2d[randomNumbery][randomNumberx] == 1)
+        {
+            int randomNumberx = (rand() & 16);
+            int randomNumbery = (rand() & 8);
+        }
+        map2d[randomNumbery][randomNumberx] = 2;
+    }
+}
 char* gen_life_str(short *life)
 {
 	char tmp[3];

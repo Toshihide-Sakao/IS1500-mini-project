@@ -1,33 +1,36 @@
 #include <stdlib.h>
+// #include <GLUT/glut.h>
 #include <GL/glut.h>
 #include <math.h>
 #include <stdint.h>
-
+#include <time.h>
 #include "vector.h"
 #include "player.h"
 
 #define PI 3.14159265535
 
-#define mapX 16  // map width
-#define mapY 8 // map height
-#define squareS 8  // map cube size
+#define mapX 16   // map width
+#define mapY 8    // map height
+#define squareS 8 // map cube size
 
 #define pixS 10 // map cube size
 
 uint8_t map2d[8][16] =
-	{
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
-		{1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1},
+        {1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
 vec2 player_pos = {50, 9};
+vec2 enemy_pos = {51, 10};
 double player_angle = PI * (0.0 / 4.0);
+double enemy_angle = PI * (0.0 / 4.0);
 
 void set_pos(int x, int y)
 {
@@ -56,7 +59,7 @@ void draw_rects(int startX, int startY, int endX, int endY)
     }
 }
 
-void clr_pos(int x, int y) 
+void clr_pos(int x, int y)
 {
     int x_offset = x * squareS;
     int y_offset = y * squareS;
@@ -77,13 +80,33 @@ void drawMap2D()
     int x, y;
     for (y = 0; y < mapY * 2; y++)
     {
-        for (x = 0; x < mapX *2; x++)
+        for (x = 0; x < mapX * 2; x++)
         {
             if (map2d[y / 2][x / 2] == 1)
             {
                 set_pos(x + 96, y + 1);
             }
         }
+    }
+}
+
+spawn_enemies(uint8_t map2d[8][16])
+{
+    srand(time(0));
+    int randomNumberx = (rand() & 16);
+    int randomNumbery = (rand() & 8);
+    if (map2d[randomNumbery][randomNumberx] == 0)
+    {
+        map2d[randomNumbery][randomNumberx] = 2;
+    }
+    else
+    {
+        while (map2d[randomNumbery][randomNumberx] == 1)
+        {
+            int randomNumberx = (rand() & 16);
+            int randomNumbery = (rand() & 8);
+        }
+        map2d[randomNumbery][randomNumberx] = 2;
     }
 }
 
@@ -106,7 +129,7 @@ void Buttons(unsigned char key, int x, int y)
     {
         rotate_player(&player_angle);
     }
-    
+
     glutPostRedisplay();
 } //-----------------------------------------------------------------------------
 
@@ -121,6 +144,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawMap2D();
     draw_player(player_pos, player_angle, map2d);
+
     glutSwapBuffers();
 }
 

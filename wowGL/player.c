@@ -30,6 +30,16 @@ void draw_player(vec2 pos, double angle, uint8_t map2d[8][16])
     last_dir = dir;
 }
 
+void draw_enemy(vec2 pos, double angle, uint8_t map2d[8][16]) {
+    clr_pos((int)last_pos.x, (int)last_pos.y);
+
+    vec2 player_mpos = {(pos.x * 2) / 4 + 96, (pos.y *2) / 4 + 1};
+    set_pos((int)player_mpos.x, (int)player_mpos.y);
+
+    last_pos = player_mpos;
+
+}
+
 void move_player(vec2 *pos, double angle) {
     pos->x += cos(angle) / 5;
     pos->y += sin(angle) / 5;
