@@ -256,7 +256,6 @@ void enemy_attack_check(short *player_life)
 	}
 }
 
-<<<<<<< HEAD
 spawn_enemies(uint8_t map2d[8][16])
 {
     srand(time(0));
@@ -275,7 +274,7 @@ spawn_enemies(uint8_t map2d[8][16])
         }
         map2d[randomNumbery][randomNumberx] = 2;
     }
-=======
+}
 char* gen_life_str(short *life)
 {
 	char tmp[3];
@@ -301,7 +300,6 @@ char* gen_scr_str(int *score)
 	tmp[i + str_len] = '\0';
 
 	return tmp;
->>>>>>> 1f0e659c5760df7638f86ecef879d2588f4e18f3
 }
 
 // game loop
