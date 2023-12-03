@@ -3,10 +3,10 @@
 // WADS to move player.
 
 #include <stdlib.h>
-#include <GL/glut.h>
+#include<GLUT/glut.h>
 #include <math.h>
 #include <stdint.h>
-
+#include <time.h>
 #include "vector.h"
 #include "player.h"
 
@@ -34,7 +34,9 @@ uint8_t map2d[8][16] =
 };
 
 vec2 player_pos = {50, 9};
+vec2 enemy_pos = {51, 10};
 double player_angle = PI * (0.0 / 4.0);
+double enemy_angle = PI * (0.0 / 4.0);
 
 void set_pos(int x, int y)
 {
@@ -62,6 +64,8 @@ void draw_rects(int startX, int startY, int endX, int endY)
         }
     }
 }
+
+
 
 void clr_pos(int x, int y) 
 {
@@ -93,6 +97,24 @@ void drawMap2D()
         }
     }
 } //-----------------------------------------------------------------------------
+
+    spawn_enemies(uint8_t map2d[8][16]) {
+    srand(time(0));
+    int randomNumberx = (rand() & 16);
+    int randomNumbery = (rand() & 8);
+    if (map2d[randomNumbery][randomNumberx] == 0 ) {
+        map2d[randomNumbery][randomNumberx] = 2;
+    } else {
+        while (map2d[randomNumbery][randomNumberx] == 1)
+        {
+            int randomNumberx = (rand() & 16);
+            int randomNumbery = (rand() & 8);
+        }
+        map2d[randomNumbery][randomNumberx] = 2;
+    }
+
+    return map2d;
+}
 
 
 void Buttons(unsigned char key, int x, int y)
@@ -139,6 +161,7 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawMap2D();
     draw_player(player_pos, player_angle, map2d);
+    draw_enemy(enemy_pos, enemy_angle, map2d);
     // drawRays2D();
     glutSwapBuffers();
 }
