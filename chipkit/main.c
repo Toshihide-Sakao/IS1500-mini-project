@@ -1,7 +1,5 @@
 #include <pic32mx.h>
-#include <stdlib.h>
 #include <stdint.h>
-
 #include <math.h>
 #include "chipkit_funcs.h"
 #include "game.h"
@@ -133,13 +131,15 @@ void main_scr_input()
 			{
 				reset_textbuffer();
 				reset_map();
-				init_game(map);
 
-				player_life = 1;
-				player_score = 10;
+				player_life = 10;
+				player_score = 0;
 
 				selected = 5; // so nothing selected
+				init_game(map);
+
 				game_state = 1;
+				
 
 				delay(1000);
 			}
@@ -221,21 +221,21 @@ void dead_screen()
 	reset_map();
 	reset_textbuffer();
 
-	char score_str[13];
-	char *tmp1 = "  Score: ";
-	char *tmp2 = (char*)itoaconv((int)player_score);
+	char score_str[14];
+	char *tmp1 = " Score: ";
+	char *score = itoaconv((int)player_score);
 	int i;
-	for (i = 0; i < 9; i++)
+	for (i = 0; i < 8; i++)
 	{
 		score_str[i] = tmp1[i];
 	}
 
-	int str_len = sizeof(tmp2) / sizeof(tmp2[0]);
+	int str_len = sizeof(score) / sizeof(score[0]);
 	for (i = 0; i < str_len; i++)
 	{
-		score_str[i + 9] = tmp2[i];
+		score_str[i + 8] = score[i];
 	}
-	score_str[i + str_len] = '\0';
+	score_str[8 + str_len] = '\0';
 
 	display_string(0, "   YOU DIED");
 	display_string(1, score_str);

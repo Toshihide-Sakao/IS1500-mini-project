@@ -1299,7 +1299,7 @@ int player_score = 0;
 uint8_t pistol_num = 0;
 uint8_t shooting = 0;
 
-uint8_t enemy_num = 0;
+uint8_t enemy_anim_frame = 0;
 
 void draw_map(uint32_t *map)
 {
@@ -1377,7 +1377,7 @@ void draw_enemy(int x, uint32_t *map)
 	for (i = 0; i < 30; i++)
 	{
 		map[x + i] &= ~enemy_border[i];
-		set_column(x + i, enemy[i + 30 * (enemy_num % 4)], map);
+		set_column(x + i, enemy[i + 30 * (enemy_anim_frame % 4)], map);
 	}
 }
 
@@ -1403,7 +1403,7 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 	// printf("b: tmp2 = %x & %x = %x then shift\n", enemy_border[col], 0b11111110000000000000000000000000, (enemy_border[col] & 0b11111110000000000000000000000000));
 	// printf("b: real_b; %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_border: %x\n", enemy_border[col], tmp0, tmp1, tmp2, tmp_border);
 
-	int enem_col = col + 30 * (enemy_num % 4);
+	int enem_col = col + 30 * (enemy_anim_frame % 4);
 	tmp0 = enemy[enem_col] & 0b111;
 	tmp1 = (enemy[enem_col] & middle_mask) >> amount_rem;
 	tmp2 = (enemy[enem_col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
@@ -1417,7 +1417,7 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 void draw_enemy_x(int x, int col, uint32_t *map)
 {
 	map[x] &= ~enemy_border[col];
-	set_column(x, enemy[col + 30 * (enemy_num % 4)], map);
+	set_column(x, enemy[col + 30 * (enemy_anim_frame % 4)], map);
 }
 
 void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
