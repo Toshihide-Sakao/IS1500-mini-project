@@ -140,7 +140,7 @@ void main_scr_input()
 
 				init_game(map);
 				game_state = 1;
-				reset_map();
+				display_reset();
 				delay(1000);
 			}
 			else if (selected == 2)
