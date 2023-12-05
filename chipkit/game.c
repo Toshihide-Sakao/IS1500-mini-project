@@ -73,6 +73,18 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 	}
 }
 
+void clr_rects(int startX, int startY, int endX, int endY, uint32_t *map)
+{
+	int i;
+	uint32_t tmp = ~0;
+	tmp = tmp >> (31 - (endY - startY));
+	tmp = tmp << startY;
+	for (i = startX; i < endX; i++)
+	{
+		map[i] &= ~tmp;
+	}
+}
+
 void draw_pistol(uint32_t *map)
 {
 	int i;
@@ -228,7 +240,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 				*player_angle -= 2.0 * PI;
 			}
 			rotate_player(player_angle, 1);
-			conv_2d_to_map(map2d, map);
+			// conv_2d_to_map(map2d, map);
 		}
 		if (sw & 0b1000) // sw4
 		{
@@ -241,7 +253,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 				*player_angle -= 2.0 * PI;
 			}
 			rotate_player(player_angle, -1);
-			conv_2d_to_map(map2d, map);
+			// conv_2d_to_map(map2d, map);
 		}
 	}
 	else
@@ -381,7 +393,7 @@ char *gen_scr_str(int *score)
 // game loop
 game(uint32_t *map, short *player_life, int *player_score)
 {
-	// conv_2d_to_map(map2d, map);
+	conv_2d_to_map(map2d, map);
 	draw_player(player_pos, player_angle, shot, player_score, map, map2d);
 	draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d);
 	draw_pistol(map);
