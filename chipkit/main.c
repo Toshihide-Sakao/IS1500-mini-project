@@ -115,7 +115,7 @@ void reset_textbuffer()
 		int j;
 		for (j = 0; j < 16; j++)
 		{
-			textbuffer[i][j] = 0;
+			textbuffer[i][j] = ' ';
 		}
 	}
 }
@@ -132,15 +132,15 @@ void main_scr_input()
 				reset_textbuffer();
 				reset_map();
 
-				player_life = 10;
+				player_life = 1;
 				player_score = 0;
 
 				selected = 5; // so nothing selected
+				delay(1000);
+
 				init_game(map);
-
 				game_state = 1;
-				
-
+				reset_map();
 				delay(1000);
 			}
 			else if (selected == 2)
@@ -369,6 +369,10 @@ int main(void)
 		{
 			if (player_life <= 0)
 			{
+				curr_name[0] = 'A';
+				curr_name[1] = 'A';
+				curr_name[2] = 'A';
+
 				delay(100000);
 				game_state = 3;
 			}

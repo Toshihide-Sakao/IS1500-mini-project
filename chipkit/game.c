@@ -144,7 +144,7 @@ void draw_enemy_x(int x, int col, uint32_t *map)
 	set_column(x, enemy[col + 30 * (enemy_anim_frame % 4)], map);
 }
 
-void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
+void conv_2d_to_map(uint32_t *map)
 {
 	int i, j;
 	for (i = 0; i < 8 * 2; i++)
@@ -161,23 +161,22 @@ void conv_2d_to_map(uint8_t map2d[8][16], uint32_t *map)
 	}
 }
 
-void init_game(uint32_t *map)
+void reset_enem_poses()
 {
-	frame = 0;
-
-	// reseting stuff
-	uint8_t amount_enemies = 0;
-	int i, j;
-	for (i = 0; i < 30; i++)
+	int i;
+	for (i = 0; i < 20; i++)
 	{
-		for (j = 0; j < 2; j++)
-		{
-			enemy_poses[i][j] = 0;
-		}
+		enemy_poses[i][0] = 0;
+		enemy_poses[i][1] = 0;
 	}
-	for (i = 0; i < 8; i++)
+}
+
+void reset_map2d()
+{
+	int i, j;
+	for (i = 1; i < 7; i++)
 	{
-		for (j = 0; j < 16; j++)
+		for (j = 1; j < 15; j++)
 		{
 			if (map2d[i][j] == 2)
 			{
@@ -185,10 +184,21 @@ void init_game(uint32_t *map)
 			}
 		}
 	}
+}
+
+void init_game(uint32_t *map)
+{
+	frame = 0;
+
+	// reseting stuff
+	amount_enemies = 0;
+	reset_enem_poses();
+	reset_map2d();
 
 	vec2 player_pos = {50, 9};
 	double player_angle = PI * (4.0 / 4.0);
-	conv_2d_to_map(map2d, map);
+
+	// conv_2d_to_map(map2d, map);
 }
 
 void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
@@ -290,7 +300,7 @@ void spawn_enemies(uint32_t *map)
 	srand(frame);
 	int randomNumberx = (rand() % 16);
 	int randomNumbery = (rand() % 8);
-	
+
 	if (map2d[randomNumbery][randomNumberx] == 0)
 	{
 		map2d[randomNumbery][randomNumberx] = 2;
@@ -393,7 +403,7 @@ char *gen_scr_str(int *score)
 // game loop
 game(uint32_t *map, short *player_life, int *player_score)
 {
-	conv_2d_to_map(map2d, map);
+	conv_2d_to_map(map);
 	draw_player(player_pos, player_angle, shot, player_score, map, map2d);
 	draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d);
 	draw_pistol(map);
@@ -430,7 +440,7 @@ game(uint32_t *map, short *player_life, int *player_score)
 		diff = (int)(diff / 1.03);
 	}
 
-	if ((int)frame % 80 == 0)
+	if ((int)frame % 60 == 0)
 	{
 		update_enemy_poses();
 	}
