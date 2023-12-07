@@ -25,6 +25,7 @@ float smallest(float a, float b)
     }
 }
 
+// so the angle is between 0 and 2PI
 float fix_angle(float angle)
 {
     if (angle < 0.0)
@@ -50,31 +51,29 @@ float abs_myting(float x)
         return x;
     }
 }
-
+// THE REAL SHIT
 void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *player_score, uint32_t *map, uint8_t map2d[8][16])
 {
+    // m stands for map
     int mx, my, dof, enemy_hit = 0, enemy_rendered = 0;
     float rx, ry, ra, x_offset, y_offset, dist, disEnemy;
-    uint8_t number_of_enem_rays = 0;
-    int which_enemy_x = 1000, which_enemy_y = 1000;
-    int enemy_done = 1;
 
-    // char *debug = "d";
-    // char *debug2 = "o";
+    // how many rays to render the enemy (so how scaled it should be) (how thick it is)
+    uint8_t number_of_enem_rays = 0;
+    int which_enemy_x = 1000, which_enemy_y = 1000; // big number
+    int enemy_done = 1; // when one enemy is drawn enemy_done is 1 and then the next enemy can be drawn
 
     ra = (float)(player_angle - (FOV / 2)); // fix back 30 degrees
     ra = fix_angle(ra);
 
-    float CosPa = cos(player_angle);
+    float CosPa = cos(player_angle); // saves values
     float SinPa = sin(player_angle);
 
     float disEnemyV = 1000000; // super high number
     float disEnemyH = 1000000; // super high number
 
-    int killed = 0;
+    int killed = 0; // checks if this frame killed an enemy
 
-    // debug = itoaconv((int)(player_pos.x));
-    // debug2 = itoaconv((int)(player_pos.y));
     int r;
     for (r = 0; r < 30; r++)
     {
@@ -82,15 +81,14 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
         dof = 0;                                                    // depth of field
         float disH = 1000000, hx = player_pos.x, hy = player_pos.y; // super high number
 
-        // float Tan = tan(ra);
         float Tan = sin(ra) / cos(ra);                // tan does not work in chipkit lmao!!!!!!!!!!!!!!!!!
         if (ra > PI + 0.001 && ra < 2.0 * PI - 0.001) // ray looking up
         {
-            float pmy = floor(player_pos.y / 4);
-            ry = pmy * 4.0 - 0.001;
+            float pmy = floor(player_pos.y / 4);            // player map y
+            ry = pmy * 4.0 - 0.001;                         // height/width in map2d for one position is 4
             rx = (ry - player_pos.y) / Tan + player_pos.x;
-            y_offset = -4;
-            x_offset = y_offset / Tan;
+            y_offset = -4;                                  // how much to move in y every check
+            x_offset = y_offset / Tan;                      // how much to move in x every check
         }
         else if (ra < PI - 0.001 && ra > 0.001) // ray looking down
         {
@@ -107,31 +105,41 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
             dof = DOFLIMIT;
         }
 
+        // while the ray has not hit a wall or not found any wall after 8 searches
         while (dof < DOFLIMIT)
         {
+            // get map equivalent of ray position
             mx = (int)(rx) / 4;
             my = (int)(ry) / 4;
 
+            // checks if the ray hit a wall or if it is outside the map
             int check = (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 1) || (mx >= 16 || mx <= 0 || my >= 8 || my <= 0);
             if (check) // hit wall
             {
+                // set the depth of field to the limit so it breaks out of loop
                 dof = DOFLIMIT;
                 hx = rx;
                 hy = ry;
-                disH = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y); // rx is wrong
+                disH = CosPa * (rx - player_pos.x) + SinPa * (ry - player_pos.y); // distance to wall
             }
             else
             {
+                // if the ray hit an enemy
                 if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 2 && enemy_hit == 0)
                 {
+                    // if the ray is a shot and the enemy is in the right place (kill the enemy)
                     if (shot == 1 && (r >= 14 && r <= 15))
                     {
                         killed = 1;
                         map2d[my][mx] = 0;
                     }
+                    // if the ray is not a shot (draw the enemy)
                     else
                     {
-                        enemy_hit = 1;
+                        enemy_hit = 1; // draw a column of the enemy
+
+                        // if the last enemy hit has finished drawing and the enemy hit is not the same as the last enemy hit
+                        // then start with a new enemy
                         if (enemy_done == 1 && which_enemy_x != mx && which_enemy_y != my)
                         {
                             disEnemyH = CosPa * (mx - (player_pos.x / 4)) + SinPa * (my - (player_pos.y / 4));
@@ -139,19 +147,18 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
                             enemy_rendered = 0;
                             which_enemy_x = mx;
                             which_enemy_y = my;
-                            // printf("H in enemydone, disEnemyH: %f, ex: %d, ey: %d\n", disEnemyH, which_enemy_x, which_enemy_y);
                         }
-                        // printf("H: enemy hit, r: %d\n", r);
                     }
                 }
 
+                // move ray to next position
                 rx += x_offset;
                 ry += y_offset;
                 dof += 1;
             }
         }
 
-        // Vertical
+        // Vertical (same as horizontal but with different offsets)
         dof = 0;
         float disV = 1000000, vx = player_pos.x, vy = player_pos.y; // super high number
 
@@ -195,7 +202,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
             {
                 if (mx < 16 && my < 8 && mx >= 0 && my >= 0 && map2d[my][mx] == 2 && enemy_hit == 0)
                 {
-                    if (shot == 1 && (r >= 14 && r <= 15))
+                    if (shot == 1 && (r >= 14 && r <= 15) && killed == 0)
                     {
                         killed = 1;
                         map2d[my][mx] = 0;
@@ -211,9 +218,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
                             enemy_rendered = 0;
                             which_enemy_x = mx;
                             which_enemy_y = my;
-                            // printf("V in enemydone, disEnemyV: %f, ex: %d, eY: %d\n", disEnemyV, which_enemy_x, which_enemy_y);
                         }
-                        // printf("V: enemy hit, r: %d\n", r);
                     }
                 }
 
@@ -265,7 +270,7 @@ void draw_rays_3d(vec2 player_pos, double player_angle, uint8_t shot, int *playe
         // if the enemy is hit and the enemy is close enough to be rendered
         if (enemy_hit && disEnemy < 7 && enemy_done == 0)
         {
-            // sets how many rays the enemy will take up
+            // sets how many rays the enemy will take up (how thick it is)
             number_of_enem_rays = enemy_dist[(int)disEnemy];
 
             int o;
