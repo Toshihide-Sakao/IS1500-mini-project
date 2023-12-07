@@ -90,26 +90,6 @@ void drawMap2D()
     }
 }
 
-spawn_enemies(uint8_t map2d[8][16])
-{
-    srand(time(0));
-    int randomNumberx = (rand() & 16);
-    int randomNumbery = (rand() & 8);
-    if (map2d[randomNumbery][randomNumberx] == 0)
-    {
-        map2d[randomNumbery][randomNumberx] = 2;
-    }
-    else
-    {
-        while (map2d[randomNumbery][randomNumberx] == 1)
-        {
-            int randomNumberx = (rand() & 16);
-            int randomNumbery = (rand() & 8);
-        }
-        map2d[randomNumbery][randomNumberx] = 2;
-    }
-}
-
 void Buttons(unsigned char key, int x, int y)
 {
     if (key == 'a')
@@ -120,16 +100,25 @@ void Buttons(unsigned char key, int x, int y)
     }
     if (key == 'w')
     {
-        move_player(&player_pos, player_angle);
+        // move_player(&player_pos, player_angle);
+        move_p1_up();
     }
     if (key == 's')
     {
+        move_p1_down();
+    }
+    if (key == 'i')
+    {
+        move_p2_up();
+    }
+    if (key == 'k')
+    {
+        move_p2_down();
     }
     if (key == 'q')
     {
-        rotate_player(&player_angle);
+        // rotate_player(&player_angle);
     }
-
     glutPostRedisplay();
 } //-----------------------------------------------------------------------------
 
@@ -137,13 +126,18 @@ void init()
 {
     glClearColor(0.3, 0.3, 0.3, 0);
     gluOrtho2D(0, 1024, 510, 0);
+
+    pong_init();
 }
 
+// gameloop
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    drawMap2D();
-    draw_player(player_pos, player_angle, map2d);
+    // drawMap2D();
+    // draw_player(player_pos, player_angle, map2d);
+
+    pong_game();
 
     glutSwapBuffers();
 }
