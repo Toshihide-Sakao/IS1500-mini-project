@@ -12,20 +12,20 @@ uint8_t game_state = 0;
 uint8_t selected = 1; // which row is seleted (bits inversed)
 
 char l_name[4][3]; // leaderboard names (has 4 so it can sort it without showing it)
-int l_score[4]; // leaderboard scores (has 4 so it can sort it without showing it)
+int l_score[4];	   // leaderboard scores (has 4 so it can sort it without showing it)
 
 // leaderboard string for row 1, 2 and 3
-char l1[14]; 
+char l1[14];
 char l2[14];
 char l3[14];
 
 // the string for the current name input
 char curr_name[3] = "AAA";
 int char_selected = 65; // 65 = A, 66 = B, 67 = C, etc. (so starting at A)
-int curr_char = 0; // which char is selected (0 = first, 1 = second, 2 = third)
+int curr_char = 0;		// which char is selected (0 = first, 1 = second, 2 = third)
 
 short player_life = 10; // player life
-int player_score = 0; // player score
+int player_score = 0;	// player score
 
 // generate a empty leaderboard
 void gen_fake_leaderboard()
@@ -53,7 +53,7 @@ void gen_fake_leaderboard()
 }
 
 // generate a leaderboard string for a row
-char* gen_l_str(int i)
+char *gen_l_str(int i)
 {
 	char l_str[14];
 	l_str[0] = (char)((i + 1) + 48);
@@ -133,14 +133,29 @@ void reset_textbuffer()
 // cheking for main screen inputs
 void main_scr_input()
 {
-	int btns = getbtns(); // getting btns
-	if (btns != 0) // if any btns are pressed
+	// pong easter egg
+	int btns = getbtns();
+	if (getbtn1())
+	{
+		reset_textbuffer();
+		reset_map();
+
+		// ----------inits pong -----------
+		pong_init(map);
+		game_state = 5; // go to pong!!!!
+		// --------------------------------
+
+		delay(100000);
+	}
+
+	btns = getbtns(); // getting btns
+	if (btns != 0)		  // if any btns are pressed
 	{
 		if (btns & 0b1) // btn2
 		{
 			if (selected == 1) // if start is selected
 			{
-				// reseting all shit that can make any bug to happen 
+				// reseting all shit that can make any bug to happen
 				reset_textbuffer();
 				reset_map();
 
@@ -152,12 +167,8 @@ void main_scr_input()
 				delay(1000);
 
 				// ----------inits real game -----------
-				// init_game(map);
+				init_game(map);
 				// -------------------------------------
-
-				// ----------inits pong -----------
-				pong_init();
-				// --------------------------------
 
 				game_state = 1; // go to game!!!!
 				display_reset();
@@ -170,7 +181,7 @@ void main_scr_input()
 				reset_map();
 				sort_l_board(); // sorts leaderboard
 
-				selected = 5; // set so nothing is selected
+				selected = 5;	// set so nothing is selected
 				game_state = 2; // go to leaderboard
 
 				// testing ------------
@@ -186,7 +197,7 @@ void main_scr_input()
 		{
 			// DUMBEST SOLUTION EVER BUT I LIKE IT
 			selected++;
-			if (selected > 2) 
+			if (selected > 2)
 			{
 				selected = 1;
 			}
@@ -203,7 +214,7 @@ void main_screen()
 	display_string(0, " BLOB SHOOT");
 	display_string(1, "   Start");
 	display_string(2, "Leaderboard");
-	char* tmp = 	  "~B4  {  zB2"; // ~ is downarrow and z is select, { is |
+	char *tmp = "~B4  {  zB2"; // ~ is downarrow and z is select, { is |
 	display_string(3, tmp);
 	display_update_text(10, 11, selected, map);
 
@@ -225,7 +236,7 @@ void leader_screen()
 
 	delay(100000);
 	int btns = getbtns(); // getting btns
-	if (btns != 0)	// if any btns are pressed
+	if (btns != 0)		  // if any btns are pressed
 	{
 		if (btns & 0b100) // btn4
 		{
@@ -280,7 +291,7 @@ void dead_screen()
 
 	delay(100000);
 	int btns = getbtns(); // getting btns
-	if (btns != 0) 		// if any btns are pressed
+	if (btns != 0)		  // if any btns are pressed
 	{
 		// delay(100000);
 		if (btns & 0b1) // btn2
@@ -424,12 +435,8 @@ int main(void)
 			else // alive
 			{
 				// ------- for real game --------
-				// game(map, &player_life, &player_score);
+				game(map, &player_life, &player_score);
 				// -----------------------------------
-
-				//------- for pong -------
-				pong_game();
-				// ------------------------
 			}
 		}
 		else if (game_state == 2) // leader board
@@ -446,6 +453,18 @@ int main(void)
 		{
 			delay(10000);
 			name_input();
+		}
+		else if (game_state == 5) // for pong easter egg
+		{
+			//------- for pong -------
+			if(pong_game(map))
+			{
+				delay(10000);
+				selected = 2;
+				game_state = 0;
+			}
+			delay(50000);
+			// ------------------------
 		}
 
 		display_update(map); // update display

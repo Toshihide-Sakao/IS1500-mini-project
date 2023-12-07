@@ -32,12 +32,12 @@ void pong_init()
     p2y = 15;
 }
 
-void update_ball()
+void update_ball(uint32_t *map)
 {
-    clr_pos((int)ballx, (int)bally);
-    clr_pos((int)ballx + 1, (int)bally);
-    clr_pos((int)ballx, (int)bally + 1);
-    clr_pos((int)ballx + 1, (int)bally + 1);
+    clr_pos((int)ballx, (int)bally, map);
+    clr_pos((int)ballx + 1, (int)bally, map);
+    clr_pos((int)ballx, (int)bally + 1, map);
+    clr_pos((int)ballx + 1, (int)bally + 1, map);
 
     if (bally + diry < 1 || bally + diry > 29)
     {
@@ -51,21 +51,21 @@ void update_ball()
     ballx += dirx;
     bally += diry;
 
-    set_pos((int)ballx, (int)bally);
-    set_pos((int)ballx + 1, (int)bally);
-    set_pos((int)ballx, (int)bally + 1);
-    set_pos((int)ballx + 1, (int)bally + 1);
+    set_pos((int)ballx, (int)bally, map);
+    set_pos((int)ballx + 1, (int)bally, map);
+    set_pos((int)ballx, (int)bally + 1, map);
+    set_pos((int)ballx + 1, (int)bally + 1, map);
 }
 
-draw_player_pong()
+draw_player_pong(uint32_t *map)
 {
     int i, j;
     for ( i = 0; i < pwidth; i++)
     {
         for ( j = 0; j < pheight; j++)
         {
-            clr_pos((int)last_p1x - 1 + i, (int)last_p1y - (pheight/2) + j);
-            clr_pos((int)last_p2x + i, (int)last_p2y - (pheight / 2) + j);
+            clr_pos((int)last_p1x - 1 + i, (int)last_p1y - (pheight/2) + j, map);
+            clr_pos((int)last_p2x + i, (int)last_p2y - (pheight / 2) + j, map);
         }
     }
 
@@ -73,8 +73,8 @@ draw_player_pong()
     {
         for ( j = 0; j < pheight; j++)
         {
-            set_pos((int)p1x - 1 + i, (int)p1y - (pheight/2) + j);
-            set_pos((int)p2x + i, (int)p2y - (pheight / 2) + j);
+            set_pos((int)p1x - 1 + i, (int)p1y - (pheight/2) + j, map);
+            set_pos((int)p2x + i, (int)p2y - (pheight / 2) + j, map);
         }
     }
 }
@@ -111,23 +111,59 @@ void move_p2_down() {
     }
 }
 
-draw_board_pong()
+draw_board_pong(uint32_t *map)
 {
     int i, j;
     for ( i = 4; i < 124; i++)
     {
-        set_pos(i, 0);
-        set_pos(i, 31);
+        set_pos(i, 0, map);
+        set_pos(i, 31, map);
     }
 }
 
-
-
-void pong_game()
+void pong_inputs()
 {
-    draw_board_pong();
-    draw_player_pong();
-    update_ball();
+	int btns = getbtns();
+	if (getbtn1())
+	{
+        move_p2_down();
+	}
 
-    delay(10000);
+	if (btns != 0)
+	{
+		if (btns & 0b1) // btn2
+		{
+            move_p2_up();
+		}
+		if (btns & 0b10) // btn3
+		{
+            move_p1_down();
+		}
+		if (btns & 0b100) // btn4
+		{
+            move_p1_up();
+		}
+	}
+}
+
+int pong_game(uint32_t *map)
+{
+    draw_board_pong(map);
+    draw_player_pong(map);
+    update_ball(map);
+
+    pong_inputs();
+
+    if (ballx < 1)
+    {
+        return 2;
+    }
+    else if (ballx > 127)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
