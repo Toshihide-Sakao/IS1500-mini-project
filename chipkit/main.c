@@ -25,15 +25,15 @@ int player_score = 10;
 void gen_fake_leaderboard()
 {
 	// testing ---------------------
-	l_name[0][0] = 'Q';
-	l_name[0][1] = 'O';
-	l_name[0][2] = 'W';
-	l_score[0] = 1;
+	l_name[0][0] = ' ';
+	l_name[0][1] = ' ';
+	l_name[0][2] = ' ';
+	// l_score[0] = 0;
 
-	l_name[1][0] = 'Z';
-	l_name[1][1] = 'B';
-	l_name[1][2] = 'Z';
-	l_score[1] = 8;
+	l_name[1][0] = ' ';
+	l_name[1][1] = ' ';
+	l_name[1][2] = ' ';
+	// l_score[1] = 8;
 
 	l_name[2][0] = ' ';
 	l_name[2][1] = ' ';
@@ -132,7 +132,7 @@ void main_scr_input()
 				reset_textbuffer();
 				reset_map();
 
-				player_life = 1;
+				player_life = 10;
 				player_score = 0;
 
 				selected = 5; // so nothing selected
