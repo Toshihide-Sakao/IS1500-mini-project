@@ -23,6 +23,7 @@
 
 char textbuffer[4][16];
 
+// changed some chars to my own
 static const uint8_t const font[] = {
 	0,
 	0,
@@ -1101,6 +1102,7 @@ static const uint8_t const font[] = {
 	0b00000000
 };
 
+// all animation frames for pistol
 const uint32_t const pistol[15 * 4] = {
 	// start first
 	0, 0, 0, 0,
@@ -1148,6 +1150,7 @@ const uint32_t const pistol[15 * 4] = {
 	0b00100000000000000000000000000000,
 	0, 0};
 
+// the mask for the pistol
 const uint32_t const pistol_border[15] = {
 	0, 0, 0, 0,
 	0b11111111000000000000000000000000,
@@ -1161,6 +1164,7 @@ const uint32_t const pistol_border[15] = {
 	0, 0, 0
 };
 
+// all animation frames for enemy
 const uint32_t const enemy[30 * 4] = {
 	// first
 	0, 0, 
@@ -1280,6 +1284,7 @@ const uint32_t const enemy[30 * 4] = {
 	0, 0,
 };
 
+// the mask for the enemy
 const uint32_t const enemy_border[30] = {
 	0, 0, 
 	0b00000111111111100000000000000000,
@@ -1311,6 +1316,7 @@ const uint32_t const enemy_border[30] = {
 	0, 0
 };
 
+// copy from lab2
 void delay(int cyc)
 {
 	int i;
@@ -1318,6 +1324,7 @@ void delay(int cyc)
 		;
 }
 
+// copy from hello-display
 uint8_t spi_send_recv(uint8_t data)
 {
 	while (!(SPI2STAT & 0x08))
@@ -1328,6 +1335,7 @@ uint8_t spi_send_recv(uint8_t data)
 	return SPI2BUF;
 }
 
+// moved from hello-display and initializes the display
 void display_init()
 {
 	DISPLAY_COMMAND_DATA_PORT &= ~DISPLAY_COMMAND_DATA_MASK;
@@ -1359,6 +1367,7 @@ void display_init()
 	spi_send_recv(0xAF);
 }
 
+// modified so it does not send to display buffer directly but it sends to the map array
 void display_string(int line, char *s)
 {
 	int i;
@@ -1377,6 +1386,7 @@ void display_string(int line, char *s)
 			textbuffer[line][i] = ' ';
 }
 
+// modified so it just updates the display array according to the map array
 void display_update(const uint32_t *map)
 {
 	int i, y, x;
@@ -1394,11 +1404,13 @@ void display_update(const uint32_t *map)
 
 		for (x = 0; x < 128; x++)
 		{
+			// chooses the right 8bits to send (e.g. 0-7, 8-15, 16-23, 24-31) by using bitshift and masking
 			spi_send_recv((map[x] >> 8 * i) & 0xff);
 		}
 	}
 }
 
+// resets the diplay
 void display_reset()
 {
 	int i, y, x;
@@ -1421,6 +1433,8 @@ void display_reset()
 	}
 }
 
+// made to make the string display easier
+// sends 8 bits to the map array at the right row
 void set_8s_in_32(uint32_t *map, uint8_t num, int line, int startX)
 {
 	uint32_t mask = 0;
@@ -1428,6 +1442,7 @@ void set_8s_in_32(uint32_t *map, uint8_t num, int line, int startX)
 	map[startX] |= mask;
 }
 
+// made so the display string can be updated to the map array
 void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t *map)
 {
 	int i, j, k;
@@ -1438,14 +1453,13 @@ void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t 
 		{
 			c = textbuffer[i][j];
 
-			if (c > 132) // changed so that it can print my chars
+			if (c > 132) // changed so that it can print my chars (didnt work)
 				continue;
 
 			for (k = 0; k < 8; k++)
 			{
 				int startX = x + j * 8 + k;
-				// map[startX] &= ~(255 << (i * 8));
-				if (i == selected_row)
+				if (i == selected_row) // if the row is selected, invert the bits
 				{
 					set_8s_in_32(map, ~font[c * 8 + k], i, startX);
 				}
@@ -1458,6 +1472,7 @@ void display_update_text(int x, int amount_of_chars, int selected_row, uint32_t 
 	}
 }
 
+// made to update specific rows and specific start and end points
 void display_update_text_row(int x, int amount_of_chars, int selected_row, int row_to_change, uint32_t *map)
 {
 	int j, k;
@@ -1485,6 +1500,7 @@ void display_update_text_row(int x, int amount_of_chars, int selected_row, int r
 	}
 }
 
+// copy from lab2
 #define ITOA_BUFSIZ (24)
 char *itoaconv(int num)
 {

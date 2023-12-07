@@ -7,22 +7,25 @@
 
 #define PI 3.14159265535
 
-unsigned long int frame = 0;
-static unsigned long int next = 1;
-int diff = 250; // start with spawning oen enemy per 6sec
+unsigned long int frame = 0; // frame counter
+static unsigned long int next = 1; // for rand()
+int diff = 250; // start with spawning oen enemy per approx 6sec
 
 vec2 player_pos = {50, 9};
 double player_angle = PI * (7.0 / 4.0);
 
-uint8_t pistol_num = 0;
-uint8_t shooting = 0;
-uint8_t shot = 0;
+uint8_t pistol_num = 0; // which pistol frame to draw
+uint8_t shooting = 0; // if the pistol is should run the animation
+uint8_t shot = 0; // if the pistol is shot (for game logic)
 
-uint8_t enemy_anim_frame = 0;
-uint8_t enemy_poses[20][2];
-uint8_t amount_enemies = 0;
+uint8_t enemy_anim_frame = 0; // which enemy frame to draw
+uint8_t enemy_poses[20][2];	 // enemy positions (max enemy number is 20)
+uint8_t amount_enemies = 0; // amount of enemies
 
 // x: 96, y: 32
+// topdown view of map (1 = wall, 0 = empty, 2 = enemy)
+// one pixel is 4x4 pixels in game
+// one pixel is 2x2 in the map view at topright
 uint8_t map2d[8][16] =
 	{
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -35,6 +38,7 @@ uint8_t map2d[8][16] =
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 };
 
+// turns on the pixel at x, y
 void set_pos(int x, int y, uint32_t *map)
 {
 	uint32_t mask = 0;
@@ -42,6 +46,7 @@ void set_pos(int x, int y, uint32_t *map)
 	map[x] |= mask;
 }
 
+// turns off the pixel at x, y
 void clr_pos(int x, int y, uint32_t *map)
 {
 	uint32_t mask = 0;
@@ -49,6 +54,7 @@ void clr_pos(int x, int y, uint32_t *map)
 	map[x] &= ~mask;
 }
 
+// returns the value of the pixel at x, y
 uint8_t get_pos(int x, int y, uint32_t *map)
 {
 	uint32_t mask = 0;
@@ -56,11 +62,13 @@ uint8_t get_pos(int x, int y, uint32_t *map)
 	return (map[x] & mask) >> y;
 }
 
+// set the column at x to val (or adding the val to the column by or)
 void set_column(int x, uint32_t val, uint32_t *map)
 {
 	map[x] |= val;
 }
 
+// draw rectangles from (startX, startY) to (endX, endY)
 void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 {
 	int i;
@@ -73,6 +81,7 @@ void draw_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 	}
 }
 
+// clear rectangles from (startX, startY) to (endX, endY)
 void clr_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 {
 	int i;
@@ -85,16 +94,18 @@ void clr_rects(int startX, int startY, int endX, int endY, uint32_t *map)
 	}
 }
 
+// draw the pistol
 void draw_pistol(uint32_t *map)
 {
 	int i;
 	for (i = 0; i < 16; i++)
 	{
 		map[38 + i] &= ~pistol_border[i];
-		set_column(38 + i, pistol[i + 15 * (pistol_num % 4)], map);
+		set_column(38 + i, pistol[i + 15 * (pistol_num % 4)], map); // pistol_num % 4 is for choosing the right animation
 	}
 }
 
+// draw the whole enemy at x in full size(test func)
 void draw_enemy(int x, uint32_t *map)
 {
 	int i;
@@ -105,6 +116,7 @@ void draw_enemy(int x, uint32_t *map)
 	}
 }
 
+// draw the eneny at x in scalable size (only the x value)
 void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 {
 	// we are always keeping 7 pixels from the top and 3 from the bottom
@@ -122,28 +134,26 @@ void draw_enemy_scalable(int x, int amount_rem, int col, uint32_t *map)
 	int tmp0 = enemy_border[col] & 0b111;
 	int tmp1 = (enemy_border[col] & middle_mask) >> amount_rem;
 	int tmp2 = (enemy_border[col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
-	// int tmp2 = enemy_border[col] & 0b1111 1110 0000 0000 0000 0000 0000 0000 >> (amount_rem*2);
 	int tmp_border = (tmp0 | tmp1 | tmp2) << (amount_rem);
-	// printf("b: tmp2 = %x & %x = %x then shift\n", enemy_border[col], 0b11111110000000000000000000000000, (enemy_border[col] & 0b11111110000000000000000000000000));
-	// printf("b: real_b; %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_border: %x\n", enemy_border[col], tmp0, tmp1, tmp2, tmp_border);
 
 	int enem_col = col + 30 * (enemy_anim_frame % 4);
 	tmp0 = enemy[enem_col] & 0b111;
 	tmp1 = (enemy[enem_col] & middle_mask) >> amount_rem;
 	tmp2 = (enemy[enem_col] & 0b11111110000000000000000000000000) >> (amount_rem * 2);
 	int tmp_enemy = (tmp0 | tmp1 | tmp2) << (amount_rem);
-	// printf("e: real_e: %x, tmp0: %x, tmp1: %x, tmp2: %x, tmp_enemy: %x\n", enemy[enem_col], tmp0, tmp1, tmp2, tmp_enemy);
 
 	map[x] &= ~tmp_border;
 	set_column(x, tmp_enemy, map);
 }
 
+// draw enemy only at the x value (used for when it is super near)
 void draw_enemy_x(int x, int col, uint32_t *map)
 {
 	map[x] &= ~enemy_border[col];
 	set_column(x, enemy[col + 30 * (enemy_anim_frame % 4)], map);
 }
 
+// draw the 2dmap on the topright of the screen.
 void conv_2d_to_map(uint32_t *map)
 {
 	int i, j;
@@ -160,6 +170,7 @@ void conv_2d_to_map(uint32_t *map)
 	}
 }
 
+// reset all enemy position
 void reset_enem_poses()
 {
 	int i;
@@ -170,6 +181,7 @@ void reset_enem_poses()
 	}
 }
 
+// reset whole map2d by removing all enemies(2)
 void reset_map2d()
 {
 	int i, j;
@@ -185,6 +197,7 @@ void reset_map2d()
 	}
 }
 
+// initializes the game
 void init_game(uint32_t *map)
 {
 	frame = 0;
@@ -202,6 +215,7 @@ void init_game(uint32_t *map)
 	conv_2d_to_map(map);
 }
 
+// gets the player inputs and moves/rotates the player
 void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 {
 	int btns = getbtns();
@@ -273,6 +287,7 @@ void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
 	}
 }
 
+// if enemy is by the player -1 hp and remove the enemy (it pops :))
 void enemy_attack_check(short *player_life)
 {
 	int mx = (int)(player_pos.x) / 4;
@@ -285,6 +300,7 @@ void enemy_attack_check(short *player_life)
 	}
 }
 
+// some rand funcs
 int rand(void) // RAND_MAX assumed to be 32767
 {
 	next = next * 1103515245 + 12345;
@@ -296,6 +312,7 @@ void srand(unsigned int seed)
 	next = seed;
 }
 
+// spawn enemies
 void spawn_enemies(uint32_t *map)
 {
 	srand(frame);
@@ -308,7 +325,6 @@ void spawn_enemies(uint32_t *map)
 		enemy_poses[amount_enemies][0] = randomNumberx;
 		enemy_poses[amount_enemies][1] = randomNumbery;
 		amount_enemies++;
-		// set_pos(randomNumberx*4 + 96, (int)randomNumbery*4, map);
 	}
 	// else
 	// {
@@ -328,6 +344,8 @@ void spawn_enemies(uint32_t *map)
 	// }
 }
 
+// update enemy positions
+// so the enemies will move towards the player
 void update_enemy_poses()
 {
 	int mpx = (int)(player_pos.x / 4.0);
@@ -366,6 +384,7 @@ void update_enemy_poses()
 	}
 }
 
+// gen the life string
 char *gen_life_str(short *life)
 {
 	char tmp[5];
@@ -385,6 +404,7 @@ char *gen_life_str(short *life)
 	return tmp;
 }
 
+// gen the score string
 char *gen_scr_str(int *score)
 {
 	char tmp[5];
@@ -404,43 +424,48 @@ char *gen_scr_str(int *score)
 // game loop
 game(uint32_t *map, short *player_life, int *player_score)
 {
-	conv_2d_to_map(map);
-	draw_player(player_pos, player_angle, shot, player_score, map, map2d);
-	draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d);
-	draw_pistol(map);
+	conv_2d_to_map(map); // redraws map every frame
+	draw_player(player_pos, player_angle, shot, player_score, map, map2d); // draws the player on map2d
+	draw_rays_3d(player_pos, player_angle, shot, player_score, map, map2d); // draw the 3d screen
+	draw_pistol(map); // draw the pistol
 
-	player_inputs(&player_pos, &player_angle, map);
+	player_inputs(&player_pos, &player_angle, map); // get player inputs and move/rotate the player
 
+	// display hp and score
 	display_string(2, gen_scr_str(player_score));
-	// display_string(2, itoaconv((int)frame)); // debug
 	display_update_text_row(96, 4, 5, 2, map);
 	display_string(3, gen_life_str(player_life));
 	display_update_text_row(96, 4, 5, 3, map);
 
+	// every 6th frame run the pistol animation
 	if ((int)frame % 6 == 0 && shooting)
 	{
 		pistol_num++;
-		if (pistol_num % 4 == 3)
+		if (pistol_num % 4 == 3) // every 4th(in the 6th) frame set shot to 1
 		{
 			shot = 1;
 		}
-		else
+		else // dont shoot
 		{
 			shot = 0;
 		}
 	}
+
+	// every 4th frame run the enemy animation
 	if ((int)frame % 4 == 0)
 	{
 		enemy_anim_frame++;
 		enemy_attack_check(player_life);
 	}
 
+	// every 250th frame spawn an enemy
 	if ((int)frame % diff == 0 && amount_enemies < 20)
 	{
 		spawn_enemies(map);
 		diff = (int)(diff / 1.03);
 	}
 
+	// every 60th frame update enemy positions
 	if ((int)frame % 60 == 0)
 	{
 		update_enemy_poses();
