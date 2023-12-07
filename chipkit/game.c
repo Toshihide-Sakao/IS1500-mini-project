@@ -151,7 +151,6 @@ void conv_2d_to_map(uint32_t *map)
 	{
 		for (j = 0; j < 16 * 2; j++)
 		{
-			// int tmp = get_map2d_ol(j / 2, i / 2, map2d_overlay);
 			int tmp = map2d[i / 2][j / 2];
 			if (tmp == 1)
 			{
@@ -194,11 +193,13 @@ void init_game(uint32_t *map)
 	amount_enemies = 0;
 	reset_enem_poses();
 	reset_map2d();
+	reset_last_pos();
 
-	vec2 player_pos = {50, 9};
-	double player_angle = PI * (4.0 / 4.0);
+	player_pos.x = 50;
+	player_pos.y = 9;
+	player_angle = PI;
 
-	// conv_2d_to_map(map2d, map);
+	conv_2d_to_map(map);
 }
 
 void player_inputs(vec2 *player_pos, double *player_angle, uint32_t *map)
@@ -309,22 +310,22 @@ void spawn_enemies(uint32_t *map)
 		amount_enemies++;
 		// set_pos(randomNumberx*4 + 96, (int)randomNumbery*4, map);
 	}
-	else
-	{
-		int tmp = map2d[randomNumbery][randomNumberx];
-		while (tmp == 1)
-		{
-			int randomNumberx = (rand() & 16);
-			int randomNumbery = (rand() & 8);
+	// else
+	// {
+	// 	int tmp = map2d[randomNumbery][randomNumberx];
+	// 	while (tmp == 1)
+	// 	{
+	// 		int randomNumberx = (rand() % 16);
+	// 		int randomNumbery = (rand() % 8);
 
-			tmp = map2d[randomNumberx][randomNumbery];
-		}
-		map2d[randomNumbery][randomNumberx] = 2;
-		enemy_poses[amount_enemies][0] = randomNumberx;
-		enemy_poses[amount_enemies][1] = randomNumbery;
-		amount_enemies++;
-		// set_pos(randomNumberx*4 + 96, (int)randomNumbery*4, map);
-	}
+	// 		tmp = map2d[randomNumberx][randomNumbery];
+	// 	}
+	// 	map2d[randomNumbery][randomNumberx] = 2;
+	// 	enemy_poses[amount_enemies][0] = randomNumberx;
+	// 	enemy_poses[amount_enemies][1] = randomNumbery;
+	// 	amount_enemies++;
+	// 	// set_pos(randomNumberx*4 + 96, (int)randomNumbery*4, map);
+	// }
 }
 
 void update_enemy_poses()

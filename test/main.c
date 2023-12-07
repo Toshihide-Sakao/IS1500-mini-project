@@ -1672,8 +1672,8 @@ int main()
 	char l3[14];
 	gen_l_str(l3, 2);
 
-	printf("sorted:\n");
-	printf("%s\n%s\n%s\n", l1, l2, l3);
+	// printf("sorted:\n");
+	// printf("%s\n%s\n%s\n", l1, l2, l3);
 
 	// -----------------------------------------
 	l_name[3][0] = 'S';
@@ -1686,24 +1686,24 @@ int main()
 	gen_l_str(l1, 0);
 	gen_l_str(l2, 1);
 	gen_l_str(l3, 2);
-	printf("sorted:\n");
-	printf("%s\n%s\n%s\n", l1, l2, l3);
+	// printf("sorted:\n");
+	// printf("%s\n%s\n%s\n", l1, l2, l3);
 	// ------------------------------------------
 
-	// conv_2d_to_map(map2d, map);
+	conv_2d_to_map(map2d, map);
 
 	// // print_2d_map();
 	// // conv_2d_to_map(map2d, map);
-	// draw_player(player_pos, player_angle, map, map2d);
+	draw_player(player_pos, player_angle, map, map2d);
 	// // printf("player_pos: %f, %f\n", player_pos.x, player_pos.y);
 	// // conv_2d_to_map(map2d, map);
 
-	// // draw_pistol(map);
+	draw_pistol(map);
 
 	// display_string(0, "HELL");
 	// display_update_text_row(96, 4, 5, 0, map);
 
-	// draw_map(map);
+	draw_map(map);
 
 	// while (1)
 	// {

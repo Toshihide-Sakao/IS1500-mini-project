@@ -8,6 +8,14 @@
 vec2 last_pos = {0, 0};
 vec2 last_dir = {0, 0};
 
+void reset_last_pos()
+{
+    last_pos.x = 0;
+    last_pos.y = 0;
+    last_dir.x = 0;
+    last_dir.y = 0;
+}
+
 void draw_player(vec2 pos, double angle, uint8_t shot, int *score, uint32_t *map, uint8_t map2d[8][16])
 {
     clr_pos((int)last_pos.x, (int)last_pos.y, map);
